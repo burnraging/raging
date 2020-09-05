@@ -1,0 +1,1220 @@
+
+                  C O D I N G  S T A N D A R D
+
+=======
+ STYLE
+=======
+
+
+Spacing & Indentation
+---------------------
+
+The standard indentation is four spaces. Tabs are forbidden.
+Indentation and spacing is done in this manner:
+
+(1) The following have top-level indentation (no indentation), even with compile switches
+   [a] The file title block
+   [b] Function prototype
+   [c] The functions definition title block
+   [d] Function definition
+   [e] The start and end braces to a function definition
+
+(2) The following have top-level indentation, or optionally (at the coder's discretion) can be indented
+    if wrapped in compile switches:
+   [a] Include files
+   [b] Pre-processor defines and macros
+   [c] All other pre-processor statements
+   [e] Global variables, including those with the 'static' or 'extern' keywords
+   [f] Global-level struct definitions
+   [g] Global-level enums
+   [h] Global-level typedefs
+
+(3) The following will be indented one indentation (four spaces):
+   [a] The body of a brace-wrapped ({}) block, including nested blocks.
+   [b] When "if", "else", "else if", "while", "for" are followed by a single expression, instead
+       of a block, that expression shall be indented thus.
+
+(4) There shall be no spaces in the following:
+   [a] Between an enum member name in an enum definition and the delimiting comma
+   [b] Between a function parameter and the delimiting comma
+   [c] Between an initializer value and the delimiting comma 
+   [d] Between a preprocessor "#" symbol and the following preprocessor keyword
+   [e] Between a goto label and the semicolon
+
+(5) There shall be one, and no more than one, space for the following:
+   [a] Between an "if" keyword and the left parenthesis
+   [b] Between an "else" keyword and the "if" keyword, assuming an "else if" construct
+   [c] Between an "for" keyword and the left parenthesis
+   [d] Between an "while" keyword and the left parenthesis
+   [e] In an assignment statement, between the lvalue and the equals sign (operator),
+       or any other of the assignment operators ("+=", etc)
+
+(6) There will be a minimum of one space between the following:
+   [a] In an assignment statement, between the lvalue and the "=" sign. Ideally, 1 space
+   [b] In an assignment statement, between the rvalue expression and the "=" sign
+   [c] Above 2 apply me for an initializer
+   [d] The following operators:
+        "*", "+", "-" (binary form), "/", "%", "&", "&&", "|", "||"
+       NOTE: some instances where this is not as readable.
+
+
+Example:
+
+void foo(unsigned parm)
+{
+    unsigned i;
+    unsigned odd_count = 0;
+
+    for (i = 0; i < 10; i++)
+    {
+        if (i > 5)
+        {
+            value += i;
+        }
+    }
+
+    do
+    {
+        value--;
+    } while (value > 1);
+
+    switch (some_enum)
+    {
+    case 1:
+        x = 1;
+        break;
+
+    case 2:
+    case 3:
+        x = 5;
+        break;
+
+    default:
+        x = 10;
+        break;
+    }
+
+    return x;
+}
+
+Braces
+------
+
+(1) Start+end braces for function definitions must start in leftmost column
+
+(2) Braces for blocks (bodies of "for", "le", etc.) must follow either Allman indentation
+    style or linux kernel indentation styel. (Allman is preferred over linux kernel, however).
+
+  Allman:
+        if (a > 1)
+        {
+            b++;
+        }
+        else
+        {
+            b = 0;
+        }
+
+   Linux kernel:
+        if (a > 1) {
+        {
+            b++;
+        } else {
+            b = 0;
+        }
+
+Parenthesis
+-----------
+
+Beyond the compulsory use of parenthesis, making the code more readable is the aim of parenthesis
+use. Towards that goal, the following guidelines should be followed:
+
+(1) Use parenthesis to assure the reader that operator precedence rules aren't in question.
+
+(2) Sometimes it's good practice to omit parenthesis and rely on the precedence rules, for the
+    sake of clarity and readability. For example:
+
+    *(ptr++) = 5;   // ok
+    *ptr++ = 5;     // Perhaps better
+
+    x = ((y * 7) + (8 * 3)) / 15;
+    x = (y * 7 + 8 * 3) / 15;
+    Is better than
+
+(2) Avoid crowding parenthesis. Break them up by spaces, lines, or combinations of the two.
+
+  Negative:
+
+     x = (unsigned)(((x * 5) & 0xFF) | 3);
+     y = ((a && b) | (!a && c)) || (k | 3);
+
+  Positive:
+
+     x = (unsigned) ( ((x * 5) & 0xFF) | 3);
+     y = ( (a && b) | (!a && c) )
+                     ||
+                 (k | 3);
+
+
+Blank Lines and Hierarchy of Organization
+-----------------------------------------
+
+In writing there is an hierarchical organization from the bottom up consisting of
+clauses/phrases, sentences, paragraphs, chapters, books, volumes, libraries. In
+a similar manner, code is divided hierarchically. This hierarchy from the bottom
+up consists of:
+
+   Constructs. These consist of:
+       if, if-else, if-else if, if-else if-else
+       for, while, do-while, switch,
+       assignment statements
+       function calls
+       return statements
+   Function Sections
+   Functions
+   Files
+
+Blank lines are used at the bottommost level as the division between constructs
+and function sections. Blank lines establish boundaries between like sections of
+code, with the end result of making the code more readable.
+
+A minimum of one blank line should be inserted in the following places:
+    [a] Between function definitions
+    [b] Between constructs (see list above)
+    [c] After "break" statements in switch constructs
+
+There are exceptions to the above rule. Without these exceptions, blank lines
+would become detrimental. Exceptions:
+    [a] Assignment statements of like functionality, symmetry, or assignment
+        statements which the writer simply wants to group together should omit
+        the blank lines.
+    [b] On occasion, blank lines may be omitted to highlight grouping, at the
+        writer's discretion
+    [c] Blank lines after "break" statements in switch constructs may be
+        omitted if the code from "case" to "break" is short, or if the net
+        result is more readable.
+
+The hierarchical grouping of lines of source code follows these guidelines:
+
+(1) A blank line is the lowest level delimiter in the grouping hierarchy
+(2) Multiple consecutive blank lines can be used to emphasize a delimitation or
+    to form a higher level deliniation than a single blank line
+(3) A comment line or comment section may form the next level of deliniation
+(4) Specially coded comment lines like the one below can form another level
+    of deliniation. This is left to the writer's discretion. The ultimate goal
+    is to make the code more readable.
+
+//**************    My Major Section    ******************
+
+
+
+Legacy code
+-----------
+
+(1) When modifying a file which doesn't conform to this coding standard, use judgment as to
+    bringing it into compliance. Do not assume that you must do so; do not assume that you can't.
+
+(2) When modifying 3rd party source files, avoid making changes that would make it difficult
+    to diff the file against a newer version.
+
+
+=======================================
+    NAMING CONVENTIONS
+=======================================
+
+Elements
+--------
+ As naming conventions can become complicated, it's necessary to first list the various
+ elements wherein naming conventions are comprised.
+
+  - All lower case.                                   ex: "foo"
+  - All upper case.                                   ex: "FOO"
+  - First letter upper case, remaining lower case.    ex: "Foo"
+  - First letter lower case, next letter upper case.  ex: "gFoo"
+  - Underscore delimited.                             ex: "foo_bar"
+  - Camel case.                                       ex: "FooBar"
+  - Hybrid. A combination of the various elements.
+
+Use of Naming Elements in Raging Distribution code: NUFR, NUFR SL, RNET, Raging Utils
+---------------------------------------------------------------------
+
+  == Identifiers, functions, variable names, typedef names, struct and union names ==
+        These will use all-lower-case and underscore-delimited
+        Exceptions may be granted in difficult situations
+
+  == Enum names
+        Underscore-delimite all caps.
+            ex: MY_ENUM1, MY_ENUM2
+
+        Exceptions are for the special enums which denote NULL enum
+        or max enum. In this case, the last word can be a special word indicating null or max.
+            ex: MY_ENUM_null, MY_ENUM_max
+
+  == #define names, #define macros
+        All caps underscore delimited
+            ex:   #defind FOOL_BAR
+
+Use of Naming Elements for App Code
+-------------------------------
+  The app developer is free to use his or her preference. The following guidelines
+  should be followed:
+     1) When modifying a file, follow the conventions set forth in that file
+     2) Be consistent
+     3) Write neat, readable code
+
+Prefix Rules
+-----------------------
+
+  A unique prefix must be selected for global variables, global functions, typedefs exported in
+  header files, enums types, enums, structs and unions, #defines. The prefix is the means of
+  preventing namespace collisions, so the developer should choose a prefix which is unique. If
+  a prefix might be might common enough so that there's a high chance of causing a collision,
+  then a double-prefix can be used. There is some allowance for prefixes to break the naming
+  conventions. Examples:
+
+    void myapp_foo_bar(void);
+    unsigned myapp_variable1;
+
+  ..and allowance for things like the following:
+    FS_foo_bar
+    fsFooBar
+    FShello
+    MY_APP_hello
+    MY_APPfoo_bar
+
+Suffix Rules
+------------
+
+  When using lower-case underscore-delimited elements, typedefs should use a "_t" suffix.
+     ex:
+           typedef struct
+           {
+               unsigned x;
+               unsigned y;
+           } myapp_aggregate_t;
+
+  When using camel-case elements (which is permitted in app code), the developer is free
+  to choose a convention for typedefs, but he or she must be consistent with that convention.
+
+Rules for Enums
+---------------
+
+  In addition what's specified above, all enums used in header files must choose a unique prefix.
+  This prefix must be unique across all other named elements, including across all global enums.
+  The enums themselves and the typedef name for the enum should have some commonality.
+  The enum prefix should have some commonality with the prefixes in the module it belongs to.
+  This rule may make it difficult to tersely name enums.
+
+  An example illustrates this. In the file "fs.c", the unique prefix "fs" is used by all variables,
+  functions, etc. The enums in fs.c use a compound prefix, where the first part is the "fs" and
+  the second part is unique to the enum. There are two enums here, and they both use the common
+  "fs" prefix, but have their own unique secondary prefix ("err" and "st"). The typedef names
+  are derived from the enum names.
+
+           unsigned fs_byte_count;
+
+           // error conditions
+           typedef enum
+           {
+               FS_ERR_NOT_AVAIL,
+               FS_ERR_HW_FAILURE
+           } fs_err_t;
+
+           // file system state
+           typedef num
+           {
+               FS_ST_INITIALIZING,
+               FS_ST_READY
+           } fs_state_t;
+
+Rules for Pointers
+------------------
+
+   The Raging code uses a prefix of "_ptr" for variables which are pointers but are not well-known
+   pointers. If a particular variable name is used throughout the codebase as a pointer, it is
+   "well-known" as a pointer, and does not need a "_ptr" suffix. For example,
+
+          void foo_bar(char *buffer);
+
+   ...uses the well-known variable 'buffer'. This doesn't need a suffix. But the below example, not
+   well-known, needs one:
+
+          void print_hello(char *some_random_text_ptr);
+
+   Those writing app code are not constrainged by this, but should choose a convention of their own
+   and should stick with it.
+
+Compile Switches
+----------------
+
+   All #define's used as compile switches should have a prefix followed by a "_CS_" secondary
+   prefix indicating that it is a compile switch. Furthermore, if the compile switch appears in
+   a header file, it must be defined to a specific value, and not just an empty #define.
+   For example:
+
+           #define   MYAPP_CS_ENABLE_DIAGNOSTICS      1
+           #define   MYAPP_CS_MISC_SUPPORT            0
+
+   These are incorrect:
+
+           #define   CS_ENABLE_DIAGNOSTICS            1   // missing primary prefix
+           #define   MYAPP_ENABLE_DIAGNOSTICS         0   // missing seconday prefix
+           #define   MYAPP_CS_ENABLE_DIAGNOSTICS          // empty define
+
+Source Files
+------------
+Source files (*.c, *.h, *.cpp, *.hpp) should all be lower-case. The delimiter should be a dash,
+and not a space of an underscore. Files which belong to the same component should share the
+same prefix. A subprefix might be used also. The prefixes should be largest group leftmost.
+
+For example:
+
+    myapp-interface-task.c
+    myapp-engine-task.c
+
+...instead of:
+
+    myapp-task-interface.c
+    myapp-task-engine.c
+
+
+====================
+    OTHER STYLE
+====================
+
+(1) Single statements following "if", "else if", "else" statements should be wrapped in
+    braces
+
+  negative:
+        if (state_change)
+           condition = true;
+
+  positive:
+        if (state_change)
+        {
+           condition = true;
+        }
+
+(2) Bang-bang ("//") comments are preferred over K&R comments ("/*  */"). Use bang-bang
+  comments for everything by default. Don't comment out several lines of code with
+  K&R comments--use #if/#ifdef constructs instead.
+  K&R comments are OK for the following:
+   [a] Non-end-of line comments on source lines
+      Ex:
+           if (true  /* x == y */)
+   [b] Large bodies of text
+   [c] In cases where readability would suffer.
+
+(3) Use the defines and macros in 'raging-global.h' whenever a use presents itself.
+  Don't use defines or other macros that repeat functionality in 'raging-global.h'
+
+(4) Use the utils in 'raging-utils*.c/.h' for all Raging code. The app developer
+  may use what he or she wants for application code.
+
+
+(5) Tab characters ('\t') are forbidden.
+
+(6) For Raging code, Windows-style end-of-line characters ('\r'\n') will be used
+    instead of the Linux/Unix end-of-line ('\n' only). For application code, the
+    developer is free to follow his or her preference.
+
+(7) Structs, unions, and enums should all have typedefs. In the source code, the
+  the struct, union, or enum should be referred to by its typedef name.
+
+  Structs and unions may have a dual struct-name and struct-typedef name.
+  Sometimes the struct-name is necessary (like for linked lists), or beneficial,
+  for some compilers and debuggers. Struct-names should be the same same as
+  the typedef name but with an undescore appended.
+
+  ex:
+      typedef struct myapp_data_block_t_
+      {
+           myapp_data_block_t_  *flink;
+           uint8_t               body[30];
+      } myapp_data_block_t;
+
+      myapp_data_block_t single_instance;
+
+==============
+  COMMENTING
+==============
+
+(1) Each Function Definitions should have a comment header above it explaining the function
+    [a] Use Doxygen-style comments
+    [b] If there are successive symmetrical functions, you can share one header for several
+        functions. Example of 2 functions sharing same header:
+
+        // [Some header]
+        bool is_valid32(uint32_t value)
+        {
+            ...
+        }
+
+        bool is_valid16(uint16_t value)
+        {
+            ...
+        }
+
+(2) Function definition comment headers should be commented in this manner:
+    [a] List the function name for Doxygen's sake
+    [b] Give a brief, and if necesary a detailed description of the function
+    [c] Document each parameter. Specify whether it is an input or an output or both.
+    [d] Document the return value.
+
+(3) Function Header Commenting Guidelines
+  Function headers should be documented in such a way that another developer, one who's
+  unfamiliar with the function, can understand at a high-level how the function works
+  internally, and not have to read every line of code in it. The interface to the function
+  should be documented EXACTLY. This means the following must be documented:
+    [a] The range of values that can be used for the input parameters.
+    [b] If the input is a struct, and if not all the members are used,
+         then the members that will be used should listed and explained like
+         individual parameters.
+    [c] The range of values for the output parameters.
+    [d] Same applies for struct members on output parms as for input.
+    [e] Return values must be documented specifying range and special values.
+    [f] In an error or failure condition, if special codes or enums are
+        used on return, those should be listed.
+
+(4) General Commenting Guidelines
+    [a] Code should be commented at the hierarchy level, down to the individual line if necessary.
+    [b] Do not over-comment the code: too many comments and unnecessary comments
+        become counter-productive.
+    [c] Code which is gnarly or non-intuitive MUST BE COMMENTED.
+    [d] If there is a violation of best practices, comment the reason why.
+    [e] Do not leave code permanently commented out. Commented-out code should be temporary.
+        Temporarily commented out code should be done with a local compile #define.
+    [f] Occassionally, it may be more readable to leave code commented out permanently, as
+        a comment unto itself. This should be done with bang-bang comments over the section
+        of code.
+
+        ex:
+            //if (x == y)
+            if (true)
+            {
+
+    [g] Variable and function names.
+        Names which are chosen serve as a form of commenting. Intuitive, meaningful names
+        should be given. Long names, if it helps:
+
+        negative:
+            bool  biv;
+
+        positive:
+            bool  block_is_valid;
+
+
+=================
+   HEADER FILES
+=================
+
+(1) Only place code in header files that needs to be (or might in the future need to be)
+  exported to another .c file. Keep content local to the .c file that does not need to
+  be exported. Header files are used to export content.
+
+(2) Header files should contain "once" defines. The purpose of this is to allow the file
+  to be included multiple times in a source files but compiled just once.
+
+  This is the legacy form of setting "once" defines. The newer form ("#pragma once") is
+  not universally supported by compilers. Use the legacy form in raging code; the app
+  developer may opt to use "#pragman once" in app code.
+
+  #ifndef MY_HEADER_FILE_H_
+  #define MY_HEADER_FILE_H_
+
+  ... content ....
+
+  #endif  // MY_HEADER_FILE_H_
+
+(3) The header file "raging-global.h" should appear as the first include in every
+  .c file, and should be included in all but the most simple .h files.
+
+(4) A header file should be written to be "standalone". To accomplish this, the header
+file itself must include .h file(s) which have the declarations for any typedef,
+#define, struct, union, enum, etc. that is used in the header file.
+
+  positive:
+
+    -----    myapp-supporting.h  -----
+
+    typedef unsigned myapp_counter_t;
+
+    -----    myapp.h  -----
+
+    #include "myapp-supporting.h"
+
+    myapp_counter_t myapp_get_counter(void);
+
+    -----    some-file.c -----
+
+    #include "myapp.h"
+
+    -----    end   ------
+
+
+  negative:
+
+    -----    myapp-supporting.h  -----
+
+    typedef unsigned myapp_counter_t;
+
+    -----    myapp.h  -----
+
+    myapp_counter_t myapp_get_counter(void);
+
+    -----    some-file.c -----
+
+    // 'myapp.h' always has to have 'myapp-supporting.h' in .c file
+    #include "myapp-supporting.h"
+    #include "myapp.h"
+
+    -----    end   ------
+
+(5) Export global variables in the following way. This is necessary for compiler
+compatibility.
+
+    ------   myapp.h  ----
+
+    #ifndef MYAPP_GLOBALS
+        extern unsigned myapp_index;
+    #endif
+
+    -------  myapp.c  -----
+
+    #define MYAPP_GLOBALS
+
+    #include "myapp.h"
+
+    unsigned myapp_index;
+
+    -------  some-file.c ----
+
+    #include "myapp.h"
+
+    void foo(void)
+    {
+        if (myapp_index > 5)
+        {
+             ....
+
+    ------  end  ---------
+
+(6) Do not use 'extern' keyword for any other purpose than previous step. Using 'extern'
+on function declarations was deprecated by ANSI C years ago.
+
+=========================
+   PRE-PROCESSOR USAGE
+=========================
+
+(1) When making a pre-processor conditional compile construct, add a "#error" to catch
+compile switch misconfigurations.
+
+  ex:
+
+    #if MYAPP_CS_SERVER == 1
+        ....
+
+    # MYAPP_CS_CLIENT == 1
+        ....
+
+    #else
+        #error "Neither MYAPP_CS_SERVER nor MYAPP_CS_CLIENT is set!"
+    #endif
+
+(2) Pre-processor macro parameters should be wrapped in parenthesis. The entire
+pre-processor macro should be wrapped in parenthesis.
+
+  negative:
+
+    MYAPP_MACRO(input)    input > 5? 7 : 9
+
+  positive:
+
+    MYAPP_MACRO(input)     ( (input) > 5? 7 : 9 )
+
+
+=================================
+   'IF' CONSTRUCTS
+=================================
+
+(1) Create topmost level 'if' constructs when possible.
+Contingent on "no content" conditions noted in comments below.
+
+  negative:
+
+        if (condition_a)
+        {
+            ....
+        }
+        else
+        {
+            // no content here
+
+            if (condition_b)
+            {
+                ....
+            }
+            else
+            {
+                ....
+            }
+
+            // no content here either
+        }
+
+  positive:
+
+        if (condition_a)
+        {
+            ....
+        }
+        else if (condition_b)
+        {
+            ....
+        }
+        else
+        {
+            ....
+        }
+
+(2) Don't evaluate lvalues in 'if' conditionals.
+
+   negative:
+
+        // not allowed: 'my_bool_condition' is assigned
+        if (my_bool_condition = (x == 5))
+        {
+            ....
+        }
+        // not allowed: pre or post increment or decrement operators
+        else if (my_counter++ == 10)
+        {
+            ....
+        }
+
+(3) Prefer single if constructs over serial if constructs.
+
+    negative:
+
+        if (my_condition1)
+        {
+            x = 7;
+        }
+
+        if (my_condition2)
+        {
+            x = 9;
+        }
+
+    positive:
+
+        if (my_condition1)
+        {
+            x = 7;
+        }
+        else if (my_condition2)
+        {
+            x = 9;
+        }
+
+(4) Don't combine error or sanity checks in algorithmic if constructs.
+
+    negative:
+        uint8_t *ptr;
+
+        if (NULL == ptr)
+        {
+            return;
+        }
+        else
+        {
+            if (8 == *ptr)
+            {
+                x = 9;
+            }
+            else
+            {
+                x = 10;
+            }
+        }
+
+    positive:
+        uint8_t *ptr;
+
+        if (NULL == ptr)
+        {
+            return;
+        }
+
+        if (8 == *ptr)
+        {
+            x = 9;
+        }
+        else
+        {
+            x = 10;
+        }
+
+(5) If a variable is assigned in block in an if/else if/else construct,
+assign it in all the blocks, if possible. If not possible, add a comment to that extent
+
+    negative:
+
+        if (x > 5)
+        {
+            ....
+            y = 6;
+        }
+        else
+        {
+            ....
+
+            // Missing assignment of 'y'
+        }
+
+(6) Add a comment in some whay when an algorithmic (i.e. non-error checking) if construct is not
+terminated by an 'else'
+
+    positive:
+
+        if (x > 5)
+        {
+            ....
+        }
+        // 'else' intentionally omitted
+
+(7) Prefer boolean evaluation by boolean expressions rather than by 'if' constructs.
+
+    negative:
+
+        if (x > 5)
+        {
+            my_boolean = true;
+        }
+        else
+        {
+            my_boolean = false;
+        }
+
+    positive:
+
+        my_boolean = x > 5;
+
+
+=================================
+   'SWITCH' CONSTRUCTS
+=================================
+
+
+(1) There are a few reasons to use switch constructs. Use switch
+constructs accordingly. The reasons are:
+ [a] A more readable alternative to an 'if' construct.
+ [b] The means of specifying and capturing all enums in a conditional
+     check. Lint-like tools will detect missing occurences of enums
+     in switch constructs, but not in 'if' constructs.
+ [c] A means for compilers to optimize code; the functional equivalent of
+     FORTRAN's "computed goto". The compiler can efficiently calculate
+     case statement branch from switch statement, even when many case
+     statements are present. In an 'if' construct, each 'if'/'else if'
+     condition must be calculated.
+
+
+(2) Account for all enums when switching on an enum.
+This means that either each enum is represented by a single case
+statement, or it means that there must be a default statement to account for
+the missing enums.
+
+        typedef enum
+        {
+            MYAPP_STATE_INIT,
+            MYAPP_STATE_ENTERING,
+            MYAPP_STATE_JOINING,
+            MYAPP_STATE_EXITING
+        } myapp_state_t;
+
+        myapp_state_t state;
+
+    negative:
+
+        switch (state)
+        {
+        case MYAPP_STATE_INIT:
+            reset_handler();
+            break;
+        }
+
+    positive:
+
+        switch (state)
+        {
+        case MYAPP_STATE_INIT:
+            reset_handler();
+            break;
+        default:
+            // no action
+            break;
+        }
+
+(3) When switching on enums, prefer ordering the case statements in the same
+order as the enum.
+
+
+(4) Only use simple fall-throughs in switch statements.
+
+    negative:
+
+        x = 0;
+
+        switch (state)
+        {
+        case MYAPP_STATE_INIT:
+            x = 5;
+            // fall-through here
+
+        case MYAPP_STATE_ENTERING:
+            x += 5;
+            break;
+
+        ....
+        }
+
+    positive:
+
+        x = 0;
+
+        switch (state)
+        {
+        case MYAPP_STATE_INIT:
+            x = 10;
+            break;
+
+        case MYAPP_STATE_ENTERING:
+            x = 5;
+            break;
+
+        ....
+        }
+
+
+
+
+=================================
+   INTEGER AND LOGICAL TYPES
+=================================
+
+This section explains best coding practices, ones which are both recommended and
+enforced as a part of the coding standard.
+
+(1) Integer types.
+  [a] Unsigned integer types should be preferred over signed integer types.
+  [b] The default integer type is 'unsigned' for unsigned integers and 'int'
+      for signed integers.
+  [c] If another integer type must be used, use the C99
+      standard types defined in 'cstdint.h', which is included in 'raging-global.h'.
+      Do not use any other typedefs in place of the cstint typedefs: uint8_t, uint16_t,
+      uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t.
+  [d] Assume that a worst-case compiler which the code will be ported to will define
+      'unsigned' and 'int' to be 16-bit values, accomodating the range
+      65,535 or +32,767/-32768.
+  [e] Assume that the compiler will compile the most efficient code for built-in types.
+  [f] For Raging code, assume code will run on worst-case 16-bit 'unsigned'/'int' CPUs.
+  [g] App developers are free to make whatever integer size assumptions for their code.
+  [h] Only use cstdint types (uint8_t, uint16_t, etc.) for the following reasons:
+     [1] The variable must be set to a specific size.
+     [2] The variable's range must be lengthened to a specific size.
+     [3] When alignment is crucial in a struct, union, table, etc.
+     [4] In cases where memory savings is a premium.
+  [i] Using the cstdint typedefs rather than the built-in integer types serves
+      as a comment to alert the next developer to be on the alert for the reason
+      why the built-in type was not used.
+
+(2) Boolean types
+  [a] Use 'bool' as the boolean type. Do not use any other typedef. This is automatically
+      defined in 'raging-global.h', in the header 'stdbool.h'. 
+  [b] Use the typedefs 'true' and 'false' as much as possible. Do not use any other
+      typedefs.
+
+============================================
+   BEST PRACTICES: Structured Programming
+============================================
+
+The term "structured programming" has its roots back in the days of FORTRAN and other early
+programming languages. This was to break the habits of the early coders who wrote "spaghetti"
+code. The earlier versions of FORTRAN didn't have a complete set of "structured" constructs
+available, and there was an emphasis on reducing lines of code and sacrificing any amount
+of code readability to even the slightest increase in performance. The emphasis nowadays is
+to emphasize readability, even if it incurs slight performance penalties. This is structured
+programming.
+
+Loop constructs: 'for', 'while', 'do while'
+-------------------------------------------
+These are the three loop constructs that C supports. Do not use 'goto's when one of the
+above will suffice, which is the overwhelming majority of instances.
+
+(1) Prefer 'for' loops over 'while' loops
+  If a loop uses a loop counter, try to fit this into a 'for' construct.
+
+  negative:
+
+    unsigned i = 0;
+    while (i < 10)
+    {
+        ...
+        i++;
+    }
+
+  positive:
+
+    unsigned i;
+    for (i = 0; i < 10; i++)
+    {
+        ...
+    }
+
+(2) In 'for' loops that have incrementing counters, prefer starting the index at
+  zero and test for less than the total range.
+
+    negative:
+
+        unsigned i;
+        for (i = 1; i <= 10; i++)
+        {
+            ...
+        }
+
+    positive:
+
+        unsigned i;
+        for (i = 0; i < 10; i++)
+        {
+            ...
+        }
+
+(3) In 'for' loops, use unsigned counters for incrementing counts, but use signed
+  counters when decrementing. The signed variable should have an "_int" appended
+  to its name to remind the developer that it's signed. The range will start at
+  1 less than beginning and go down to and include zero, preferably.
+
+    ex:
+
+        int i_int;
+
+        for (i = upper_range - 1; i >= 0; i--)
+        {
+            ....
+        }
+
+(4) Use 'while' and 'do while' loops when looping is more complex than what a 'for'
+  loop will handle.
+
+(5) There are a few, but only a few, cases where a 'do while' loop is the
+  preferable looping construct. In these cases, use the 'do while'. Some of these
+  cases include:
+  [a] Loops which must always execute one pass, regarless of any condition
+
+    ex:
+        bool is_complete;
+
+        do
+        {
+            is_complete = check_flash_write_complete();
+            wait_1_millisec();
+        } while (!is_complete);
+
+(6) Judiciously use 'break' and 'continue' statements.
+  Some coding standards forbid the use of 'break' and 'continue' statements within
+  'for', 'while', and 'do while' constructs. While this is an overreach, the
+  developer must realize that poor use of 'break's and 'continue's can cause code
+  to devolve into spaghetti code in a hurry. On the other hand, well-placed 'break's
+  and 'continue's are not only necessary, but will make a difficult algorithm more
+  readable. Therefore, careful consideration must be put into using 'break's and
+  'continue's. Apply these guidelines:
+  [a] Prefer not using breaks or continues at all.
+  [b] Use breaks or continues where the alternative to not using them is less
+      elegant or less readable.
+  [c] Prefer readability over slight performance penalties in general, except where
+      performance is absolutely a premium (such as in IRQ handlers and critical sections).
+  [d] Attempt to minimize the usage of breaks and continues. Collapse instances.
+  [e] Compare alternative implementations of the same algorithms for readability, and
+      choose the most readable, the one which is easiest to maintain.
+
+
+goto's
+------
+There are many white-tower programmers who say gotos should never, ever, be used.
+Part of the reason for this hatred of gotos is the abuse they received prior to
+the advent of structured programming. In spite of the nay-sayers, there are a
+few special cases where gotos not only should be used but are the most elegant
+and the most readable solution. These cases are:
+
+  [a] Use gotos as a break-all from an inner loop in a nested loop construct.
+     ex:
+         unsigned i;
+         unsigned k;
+         unsigned q;
+
+         bool did_find = false;
+
+         for (i = 0; i < 100; i++)
+         {
+             for (k = 0; k < 10; k++)
+             {
+                 for (q = 0; q < 2; q++)
+                 {
+                     if (widget == data_base_lookup(widget, i, k, q))
+                     {
+                         did_find = true;
+                         goto found_widget;
+                     }
+                 }
+             }
+         }
+
+         found_widget:
+
+         if (did_find)
+         {
+             ....
+         }
+
+  [b] Use gotos as a means of a common exit point from a function.
+     ex:
+
+     myapp_check(void)
+     {
+         uint8_t *data1_ptr = NULL;
+         uint8_t *data2_ptr = NULL;
+         uint8_t *data3_ptr = NULL;
+
+         data1_ptr = malloc(3);
+         if (NULL == data1_ptr)
+         {
+             goto cleanup;
+         }
+
+         if (some_global_condition)
+         {
+             data2_ptr = malloc(global_amount);
+             if (NULL == data2_ptr)
+             {
+                 goto cleanup;
+             }
+
+             if (another_condition)
+             {
+                 data3_ptr = malloc(100);
+                 if (NULL == data3_ptr)
+                 {
+                     goto cleanup;
+                 }
+
+                 manipulate(data1_ptr, data2_ptr, data3_ptr);
+             }
+         }
+
+      cleanup:
+         if (NULL != data1_ptr)
+         {
+             free(data1_ptr);
+         }
+         if (NULL != data2_ptr)
+         {
+             free(data2_ptr);
+         }
+         if (NULL != data3_ptr)
+         {
+             free(data3_ptr);
+         }
+     }
+
+  [c] Use gotos in algorithms where the use of gotos is more elegant,
+    more readable, than an implementation that does not use them.
+
+  [d] Use gotos in code if it yields a slightly or subtantially better
+    savings in CPU, RAM, or code space, and this savings is of absolute,
+    paramount importance.
+
+=========================
+     BEST PRACTICES: Misc
+=========================
+
+(1) Prefer static over dynamic
+
+(2) Prefer local over global
+
+(3) Don't make function calls inside boolean expressions which are
+contingent on partial evaluation of that function.
+
+    negative:
+
+        bool myapp_foo(bool in_motion)
+        {
+            bool status;
+
+            status = in_motion || some_fcn_call();
+
+            return status;
+        }
+
+    positive:
+
+        bool myapp_foo(bool in_motion)
+        {
+            bool status;
+
+            if (in_motion)
+            {
+                status = true;
+            }
+            else
+            {
+                status = some_fcn_call();
+            }
+
+            return status;
+        }
+
+(4) Eliminate gratuitous initializations. A "gratuitous initialization" is
+an superfluous or unneeded variable initialization.
+
+    negative:
+
+        bool myapp_foo(bool in_motion)
+        {
+            bool status;
+
+            status = in_motion || some_fcn_call();
+
+            return status;
+        }
+
+    positive:
+
+        bool myapp_foo(bool in_motion)
+        {
+            bool status;
+
+            if (in_motion)
+            {
+                status = true;
+            }
+            else
+            {
+                status = some_fcn_call();
+            }
+
+            return status;
+        }
+
+(5) Use explicit casts (cast operator) in the situations listed below. Do not
+use explicit casts under any other circumstances, except when necessary to suppress
+compiler errors or warnings.
+  [a] When casting between signed and unsigned types
+  [b] When casting down (from a larger integer type to a smaller)
+  [c] When casting from a boolean to an integer or float type
+      (NOTE: C has no native boolean type, so this is informational).
+  [d] When casting an integer to an enum, or an enum to another
+      type of enum.
+  [e] When casting a void pointer to any other type
+  [f] When doing any unusual cast (like an integer to a pointer, heaven forbid).
+

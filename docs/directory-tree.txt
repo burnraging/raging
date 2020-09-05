@@ -1,0 +1,106 @@
+Directory Tree
+--------------
+
+This explains what everything is and where it is.
+
+(1) NUFR, RNET, Raging Utilities Distribution
+
+    These are in the following dirs:
+
+      ./source/*
+      ./include/*
+
+    The files in ./source/ and ./include/ won't change with a given raging release.
+    There is only one copy of these files--all projects compile against the same
+    copy.
+
+    There are certain files that NUFR, by design, allows or requires there to be
+    multiple copies of. The files are listed here:
+
+       nufr-compile-switches.h
+       nufr-platform.c/.h
+       nufr-platform-app.c/.h
+       nufr-platform-import.h
+       nufr-platform-export.h
+       nsvc-app.c/.h
+       rnet-compile-switches.h
+       rnet-app.c/.h
+
+    Their location is explained later.
+    These files are not and should not be placed in the ./source/ and ./include/
+    distribution folders becaue NUFR--by design--allows and expects there to be
+    multiple copies of these files. The files vary from one project to another.
+    It is necessary that the compiled build include one copy of each of the above
+    files.
+
+(2) NUFR Platform folder (./nufr-platform/)
+
+    The location ./nufr-platform/ is a repository for storing the project-specific
+    NUFR and RNET files. There are multiple directories under ./nufr-platform/, and
+    each child directory has a complete set of the project-specific files.
+
+    Some child directories under ./nufr-platform/ are included with the distribution;
+    the system engineer may choose to add to this his or her own child directories.
+
+    The child directories are as follows:
+
+        ./nufr-platform/pc-pthread/
+             This is used by the pthread emulation which runs on the PC. Currently
+             only the windows pthread emulation is used, but I don't see any reason
+             why this directory couldn't be shared with a linux pthread emulation.
+
+        ./nufr-platform/pc-ut/
+             The PC windows UT environment uses these files. The linux UT environment
+             could share these files also.
+
+        ./nufr-platform/small-soc/
+             Unlike ./pc-pthread/ and ./pc-ut/, which are intended for use in a
+             pthread emulation or simulation environment, ./small-soc/ is intended
+             for use in a native computing environment. A "native computing environment"
+             is either actual hardware or QEMU emulation of the actual hardware.
+             As its name suggests, ./small-soc/ has settings which are optimized for
+             a small computing environment: 2-16k RAM.
+
+             The current raging distribution has some ARM Cortex M-series port code
+             in these files. There are plans to add the hooks for an MSP430 port;
+             some code also exist for this.
+
+
+(3) The platform folder (./platform/)
+
+   Files which are CPU-specific are stored under ./platform. Files which are ARM Cortex
+   M-Series or files which are MSP430 have their own subdirectories under ./platform:
+
+      ./platform/ARM_CMx           ARM Cortex M-series specific
+      ./platform/MSP_430           (TBD) MSP430 would go here
+      ./platform/ARM_CMx/ARM_CM4   (TBD) ARM Cortex M4 specific. Files which must deviate from the
+                                         ARM Cortex M-series version.
+      ./platform/ARM_CMx/gcc       ARM Cortex M-series with gcc-specific files
+                                   Since inline assembler is compiler-specific, this directory
+                                   has gcc-type assembler
+      ./platform/ARM_CMx/ARM_CM4/gcc (TBD) ARM Coretex M4 gcc-specific files. Replacement
+                                     for ARM_CMx/gcc version.
+
+    There is a master ARM Cortex M-series directory (ARM_CMx) which houses the ARM Cortex M0, M1,
+    M2, M3, M4. Any functionality common to these CPUs (and not compiler-specificO) is
+    placed in ./ARM_CMx/.
+
+    Notice that there are limitations on these CPU-specific files. Some files are part or
+    completely assembly language, and since assembly language syntax varies from compiler
+    to compiler, there must be different versions of the same assembler for each
+    compiler. Therefore, there is one folder per compiler vendor under each CPU-specific
+    branch, and these folders have, essentially, the same content as another compiler
+    vendor folder.
+
+(4) The tests directories
+
+
+(5) Examples directory (./examples/)
+
+    Code which is showcased in NUFR manuals or which is given as an example of how to use
+    NUFR in some way or which is under development for future raging releases in lumped into
+    ./examples/.
+
+(6) Documentation
+
+    All documentation files are in ./docs/.

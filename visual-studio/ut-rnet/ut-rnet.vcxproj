@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8DC92296-2B56-4B93-9A74-EB7486F64E2E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>utrnet</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Bernie\raging\nufr-code\disco\inc;E:\Bernie\raging\nufr-code\tests\rnet-ut;E:\Bernie\raging\nufr-code\includes;E:\Bernie\raging\nufr-code\nufr-platform\pc-ut;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\arm-projects\disco\src\rx-driver.c" />
+    <ClCompile Include="..\..\sources\nsvc-globals.c" />
+    <ClCompile Include="..\..\sources\nsvc-messaging.c" />
+    <ClCompile Include="..\..\sources\nsvc-pcl.c" />
+    <ClCompile Include="..\..\sources\nsvc-pool.c" />
+    <ClCompile Include="..\..\sources\nsvc-timer.c" />
+    <ClCompile Include="..\..\sources\nsvc.c" />
+    <ClCompile Include="..\..\sources\nufr-kernel-message-blocks.c" />
+    <ClCompile Include="..\..\sources\raging-utils-crc.c" />
+    <ClCompile Include="..\..\sources\raging-utils-mem.c" />
+    <ClCompile Include="..\..\sources\raging-utils-scan-print.c" />
+    <ClCompile Include="..\..\sources\raging-utils.c" />
+    <ClCompile Include="..\..\sources\rnet-ahdlc.c" />
+    <ClCompile Include="..\..\sources\rnet-crc.c" />
+    <ClCompile Include="..\..\sources\rnet-dispatch.c" />
+    <ClCompile Include="..\..\sources\rnet-icmp.c" />
+    <ClCompile Include="..\..\sources\rnet-intfc.c" />
+    <ClCompile Include="..\..\sources\rnet-ip-utils.c" />
+    <ClCompile Include="..\..\sources\rnet-ip.c" />
+    <ClCompile Include="..\..\sources\rnet-ppp.c" />
+    <ClCompile Include="..\..\sources\rnet-top.c" />
+    <ClCompile Include="..\..\sources\rnet-udp.c" />
+    <ClCompile Include="..\..\tests\kernel-mock\ut-nufr-kernel-messaging.c" />
+    <ClCompile Include="..\..\tests\kernel-mock\ut-nufr-kernel-semaphore.c" />
+    <ClCompile Include="..\..\tests\kernel-mock\ut-nufr-kernel-task.c" />
+    <ClCompile Include="..\..\tests\kernel-mock\ut-nufr-kernel-timer.c" />
+    <ClCompile Include="..\..\tests\kernel-mock\ut-nufr-platform.c" />
+    <ClCompile Include="..\..\tests\rnet-ut\nsvc-app.c" />
+    <ClCompile Include="..\..\tests\rnet-ut\rnet-app.c" />
+    <ClCompile Include="..\..\tests\rnet-ut\ut-rnet-main.c" />
+    <ClCompile Include="..\..\tests\rnet-ut\ut-rnet-specific-tests.c" />
+    <ClCompile Include="..\..\tests\rnet-ut\ut-rnet-test-vectors.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\arm-projects\disco\inc\rx-driver.h" />
+    <ClInclude Include="..\..\includes\nsvc-api.h" />
+    <ClInclude Include="..\..\includes\nsvc.h" />
+    <ClInclude Include="..\..\includes\nufr-api.h" />
+    <ClInclude Include="..\..\includes\nufr-global.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-base-messaging.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-base-semaphore.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-base-task.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-message-blocks.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-message-send-inline.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-semaphore.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-task.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-timer.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel.h" />
+    <ClInclude Include="..\..\includes\nufr-simulation.h" />
+    <ClInclude Include="..\..\includes\raging-contract.h" />
+    <ClInclude Include="..\..\includes\raging-global.h" />
+    <ClInclude Include="..\..\includes\raging-utils-crc.h" />
+    <ClInclude Include="..\..\includes\raging-utils-mem.h" />
+    <ClInclude Include="..\..\includes\raging-utils-scan-print.h" />
+    <ClInclude Include="..\..\includes\raging-utils.h" />
+    <ClInclude Include="..\..\includes\rcoap-protocol.h" />
+    <ClInclude Include="..\..\includes\rnet-ahdlc.h" />
+    <ClInclude Include="..\..\includes\rnet-buf.h" />
+    <ClInclude Include="..\..\includes\rnet-crc.h" />
+    <ClInclude Include="..\..\includes\rnet-dispatch.h" />
+    <ClInclude Include="..\..\includes\rnet-icmp.h" />
+    <ClInclude Include="..\..\includes\rnet-intfc.h" />
+    <ClInclude Include="..\..\includes\rnet-ip-base-defs.h" />
+    <ClInclude Include="..\..\includes\rnet-ip-utils.h" />
+    <ClInclude Include="..\..\includes\rnet-ip.h" />
+    <ClInclude Include="..\..\includes\rnet-ppp.h" />
+    <ClInclude Include="..\..\includes\rnet-top.h" />
+    <ClInclude Include="..\..\includes\rnet-udp.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-ut\nufr-compile-switches.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-ut\nufr-platform-export.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-ut\nufr-platform-import.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-ut\nufr-platform.h" />
+    <ClInclude Include="..\..\tests\rnet-ut\nsvc-app.h" />
+    <ClInclude Include="..\..\tests\rnet-ut\nufr-platform-app-compile-switches.h" />
+    <ClInclude Include="..\..\tests\rnet-ut\nufr-platform-app.h" />
+    <ClInclude Include="..\..\tests\rnet-ut\rnet-app.h" />
+    <ClInclude Include="..\..\tests\rnet-ut\rnet-compile-switches.h" />
+    <ClInclude Include="..\..\tests\rnet-ut\ut-rnet-test-vectors.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

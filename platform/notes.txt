@@ -1,0 +1,13 @@
+This directory structure will fill out as we add platform ports.
+
+The structure is like this:
+
+GCC\ARM_CM0
+IAR\ARM_CM0
+KEIL\ARM_CM0
+
+
+    ARM_CM0 is the ARM Cortex M0 port 
+    ARM_CM4 is the ARM Cortex M4 port
+
+This is the structure of the platform folder.    

@@ -1,0 +1,10 @@
+*.1.tlog
+*.obj
+/simulation.exe
+/simulation.exe.intermediate.manifest
+/simulation.lastbuildstate
+/simulation.log
+/simulation.pdb
+/simulation.vcxprojResolveAssemblyReference.cache
+/vc100.idb
+/vc100.pdb

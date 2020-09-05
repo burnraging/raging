@@ -1,0 +1,61 @@
+cmake_minimum_required(VERSION 3.0.0)
+
+message("Building Tests...")
+
+#   Search for any CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
+
+#	Project Settings
+set(app_name "unit_tests")
+
+#	Project name, uses C, C++
+project(${app_name} C )
+
+#	enable tests
+ENABLE_TESTING()
+
+
+set(sources
+	#   NUFR RTOS Sources
+    sources/nufr-kernel-messaging.c
+    sources/nufr-kernel-message-blocks.c
+    sources/nufr-kernel-task.c
+    sources/nufr-kernel-timer.c
+    sources/nufr-kernel-semaphore.c
+    sources/raging-utils.c
+    sources/raging-utils-mem.c
+
+    #	NUFR Service Layer Sources
+    sources/nsvc-globals.c
+    sources/nsvc.c
+    sources/nsvc-messaging.c
+    sources/nsvc-mutex.c
+    sources/nsvc-pcl.c
+    sources/nsvc-pool.c
+    sources/nsvc-timer.c
+
+    tests/unit_test/ut_kernel_semaphore_tests.c
+    tests/unit_test/ut_kernel_messaging_tests.c
+    tests/unit_test/ut_kernel_timer_tests.c
+    tests/unit_test/platform_tests.c
+    #tests/unit_test/raging_utils_tests.c
+    tests/unit_test/task_tests.c
+    nufr-platform/pc-ut/nufr-platform.c
+    tests/unit_test/nufr-platform-app.c
+    tests/unit_test/nsvc-app.c
+    tests/unit_test/main.c
+	)
+
+set(elf_file ${app_name}.elf)
+
+add_executable(${elf_file} ${sources})
+
+target_include_directories(${elf_file} PUBLIC includes)
+target_include_directories(${elf_file} PUBLIC nufr-platform/pc-ut)
+target_include_directories(${elf_file} PUBLIC tests/unit_test)
+
+set(additional_compiler_flags -fprofile-arcs -ftest-coverage -fPIC -g -Wall -Wextra)
+target_compile_options(${elf_file} PRIVATE ${additional_compiler_flags})
+set(additional_linker_flags -fprofile-arcs -ftest-coverage -fPIC -lcunit)
+target_link_libraries(${elf_file} PRIVATE ${additional_linker_flags})

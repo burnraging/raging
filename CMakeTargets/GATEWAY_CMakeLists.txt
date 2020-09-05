@@ -1,0 +1,44 @@
+cmake_minimum_required(VERSION 3.0.0)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("Building Debug version of Firmware...")
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+     message("Building Release version of Firmware...")
+endif()
+
+#   Search for any CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
+#   Project Settings
+set(app_name "gateway")
+
+#   Project name, uses C, C++ and Assembly
+project(${app_name} C CXX)
+
+set(sources
+
+    sources/raging-utils.c
+    sources/raging-utils-mem.c
+    sources/raging-utils-crc.c
+    sources/raging-utils-scan-print.c
+
+    tools/linux/ssp-framer.cpp
+    tools/linux/ssp-packet.cpp
+    tools/linux/ssp-gateway.cpp
+    tools/linux/linux-utils.cpp
+	)
+
+set(elf_file ${app_name})
+
+add_executable(${elf_file} ${sources})
+
+target_include_directories(${elf_file} PUBLIC includes)
+target_include_directories(${elf_file} PUBLIC tools/linux)
+
+set(additional_compiler_flags -g -Wall -Wextra -std=c++11 -Weffc++ -pedantic)
+target_compile_options(${elf_file} PRIVATE ${additional_compiler_flags})
+
+set(additional_linker_flags -lpthread)
+target_link_libraries(${elf_file} PRIVATE ${additional_linker_flags})
