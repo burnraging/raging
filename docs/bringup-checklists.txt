@@ -1,0 +1,360 @@
+
+         ======================================
+         NUFR Deployment and Bringup Checklists
+         ======================================
+
+NUFR Deployment Checklist
+-------------------------
+
+> At a High-Level, Choosing amoung Various NUFR Options
+
+A. What h/w platform will this run on.
+   - If on an ARM Cortex M-series, which core, the M0, M3, or M4?
+   - If for the MSP430, which CPU?
+B. Decide whether you want a full NUFR deployment or a slimmed-down deployment.
+   - If a full deployment, any advanced NUFR features (task kill, message abort,
+     local struct)?
+   - If a slimmed-down deployment, which resource(s) is/are scarce:
+        RAM, FLASH, or CPU cyles.
+   - Is resource scarcity severe enough to warrant exclusion of portions
+     of NUFR?
+C. Will you use the make system included in the NUFR distribution, or
+   will you use your own make system?
+D. Will you use the startup and BSP files included with the NUFR distro,
+   or will you use another BSP?
+E. Will you run NUFR in a tickless mode or run it using an OS tick?
+F. Will any drivers be needed to supplement BSP?
+G. Will the RNET stack be used?
+   - Which protocols, IPv4 or IPv6, or both?
+   - What will be the MTU for packets? 
+   - How much RAM can be alloted for the RNET stack?
+
+> Gathering NUFR Files
+
+1. Core files + Platform files
+   - All files in ./sources/ and ./includes/
+   - Choose a set of platform files from one of the directories under
+       ./nufr-platform/. Choose the one which is most relevant to your
+       CPU type and resource constraints.
+      o ARM Cortex M-Series: recommend using ./nufr-platform/small-soc/
+      o MSP430: use ./nufr-platform/msp430/
+   - List of files:
+      o nufr-compile-switches.h
+      o nufr-platform.h
+      o nufr-platform.c
+      o nufr-platform-export.h
+      o nufr-platform-import.h
+
+2. BSP files. This only applies if using the BSP+startup code supplied in
+   the NUFR distro.
+   - ARM Cortex M-series
+      o ./platform/ARM_CMx
+   - MSP430
+      o ./platform/MSP430
+
+3. Add a unique set of files to each project. Get a copy of 1 of the following
+   per project. Copy these from the most relevant project in distro.
+   ARM: copy from ./disco/inc and ./disco/src
+   MSP430: copy from ./msp430projects/simple/
+   - makefile (if using distro make system)
+   - nufr-platfrom-app.h
+   - nufr-platform-app.c
+   - nsvc-app.h  (assume Service Layer [SL] is used)
+   - rnet-app.h  (all rnet* files assume RNEt stack is used)
+   - ret-app.c
+   - rnet-compile-switches.h
+
+> Choosing Settings in NUFR files
+
+1. It's recommended that the first project not attempt to slim NUFR down, as
+   slimming NUFR is more complex than not slimming it. Therefore:
+   - Use nufr-compile-switches.h settings as-is from the file copied.
+     This includes all of NUFR except for the advanced features
+   - Include all of the SL components, regardless of whether they're actually used or not
+
+2. Choose and set the platform layer settings
+   - If running on an ARM, you will probably configure it with an OS tick.
+     The MSP430 will probably be run without an OS tick.
+   - If running with an OS tick, recommend that you leave the OS tick period
+     at the default (NUFR_TICK_PERIOD == 10), which is a 100 ticks/second rate.
+   - If you need to change the OS tick, change NUFR_TICK_PERIOD in
+     nufr-platform.h and nufr-platform-export.h. Use same value.
+   - Choose a Background (BG) Task stack size.
+     Set BG_STACK_SIZE in nufr-platform-export.h
+   - If not using the distro BSP code, ensure that whatever BSP code is used,
+     that nufr-platform-export.h is included in the BSP files, and that
+     NUFR_TICK_PERIOD be used to set the time base (for SysTick in the ARM),
+     and the variables BG_STACK_SIZE and 'Bg_Stack' get used for the BG
+     task stack (the 'main()' stack).
+   - For advanced interrupt priority schemes on CPUs that support this (like
+     the ARM), adjust the 'int_lock()' interrupt mask level in nufr-platform-import.h
+
+3. Define tasks
+   - Choose the number of tasks and assign a name to each one
+   - Create an enum for each task and add it to 'nufr_tid_t' in nufr-platform.app.h
+   - For each task, choose a stack size and create a global variable for the stack.
+     Add this to nufr-platform-app.c.
+   - For each task, add an entry point function definition in the application code.
+     This function defintion will be where the task begins execution.
+   - For each task (each enum), add a line in 'nufr_task_desc' in nufr-platform-app.c
+     Add the stack variable, stack size, and entry point information set above in
+     this line.
+   - When assigning task priorities, remember that NUFR is optimized for
+     the task priority level 'NUFR_TPR_NOMINAL'. Most tasks will be set to this priority.
+
+4. Secify the number of messages in the message pool, and the number of message priorities
+   - Set 'NUFR_MAX_MSGS' in nufr-platform-app.h to set pool size. Recommend that a
+     minimum of 5 be used, and preferably 10 instead.
+   - NUFR_CS_MSG_PRIORITIES in nufr-compile-switches.h specifies the number of message
+     priorities. Use 1 to start with (the default), increase it when the need arises.
+     Remember that increasing each priority level has a small cost in RAM and CPU
+     consumption.
+
+5. Define semaphores
+   - Set number of semaphores in semaphore pool (NUFR_SEMA_POOL_END in nufr-platform-app.h).
+     You can either calculate actual number needed, or just drop in a value between 5-10,
+     if RAM isn't in short supply. Number needed:
+       o Add 1 for the SL messaging bpool (nsvc-messaging-bpool.c)
+       o Add 1 for particles (nsvc-pcl.c) if particles are used (or even just initialized)
+       o Add 1 for RNET Buffers, if RNET Buffers are used
+       o Add 1 for each mutex used
+   - Any other usage of semaphores besides the semaphore pool is uncommon
+
+6. Define mutexes
+   - Create an enum in nsvc_mutex_t in nsvc-app.h for each mutex.
+   - Increment the semaphore pool count (NUFR_SEMA_POOL_END, see above) for each mutex.
+
+7. If you decide to use particles (particles are a more advanced feature, use at your
+   own discretion), then configure them.
+   - Set NSVC_PCL_SIZE and NSVC_PCL_NUM_PCLS in nsvc-app.h according to particle
+     allocation.
+   - Be sure to increment the semaphore pool use (see above) for the particle pool.
+     This will have to be done if nsvc_plc_init() is called, regardless of whether
+     the particles are sized to zero (disabled).
+   - Set either/both NSVC_PCL_SIZE and/or NSVC_PCL_NUM_PCLS to disable particles,
+     to ensure no RAM is wasted on them if the feature isn't used.
+
+8. Configure app timers
+   - Set the number in the pool (max number of app timers) by setting NSVC_NUM_TIMER
+     in nsvc-app.h
+   - The pool number should be greater than or equal to the number of app timer allocations
+     (nsvc_timer_init()).
+   - If not using a tickless timer, verify that nsvc_timer_expire_timer_callin() is
+     being called in nufr-platform.c. This should be included in the code from the
+     files copied over--it should be there.
+   - If using a tickless OS, select a driver for the quantum timer. One is included
+     for the MSP430 in the distro.
+   - You will also need the current time callback function.
+   - These callbacks will be passed to nsvc_timer_init().
+
+9. Configure message prefixes if message prefixes are used. This is the enum
+   nsvc_msg_prefix_t in nsvc-app.h. Message prefixes allow messages to be segregated
+   by task, etc. If using the RNET stack, you must configure the prefix
+   NSVC_MSG_RNET_STACK at a minimum (see RNET stack section).
+
+> Configure the RNET Stack, if feature is desired
+
+1. Configure the RNET compile switches (rnet-compile-switches.h)
+   - Unless you are short of FLASH resources, enable both
+     RNET_CS_USING_BUFS and RNET_CS_USING_PCLS, even if you are not
+     using either RNET buffers or particles.
+   - Turn on one or the other of: RNET_CS_USING_BUFS_FOR_TX
+     or RNET_CS_USING_PCLS_FOR_TX. Do not turn them both on at same time.
+     Recommendation: if you're using RNET buffers, turn on RNET_CS_USING_BUFS_FOR_TX
+   - Turn off all RNET Test-Mode-Only switches
+
+2. Decide whether RNET will use RNET buffers or particles (or both). It's recommended
+   that you use RNET buffers, unless RAM is scarce.
+   - To configure RNET buffers, set RNET_BUF_SIZE and RNET_NUM_BUFS in rnet-app.h
+     Set RNET_BUF_SIZE to the packet MTU. Set RNET_NUM_BUFS according to how deep
+     the RNET buffer pools needs to be. This varies from app to app.
+     Remember: the RNET buffer pool will consume RNET_BUF_SIZE * RNET_NUM_BUFS
+               bytes (a bit more, actually). Use discretion.
+   - Increment semaphore pool by one if RNET is used, regardless of whether
+     RNET Buffers are used or particles are used instead.
+   - If particles are used, adjust the particle parameters in the SL accordingly
+     (see above).
+
+3. Configure other RNET settings in rnet-app.h and rnet-app.c. See manual for details.
+   Generally speaking:
+   - Choose physical interface (UART, etc) that will be used as RNET's interface.
+     RNET can run on multiple interfaces, so you can inlude multiple physical interfaces.
+   - Select or write, if necessary, a packet driver for each physical interface.
+     The packet driver will have to be able to send and receive RNET buffers and/or
+     particles. The NUFR distro provides a serial RNET buffer driver in the disco
+     project. Start with that. Use it as an instructional on writing your own
+     drivers.
+   - Have the driver work for multiple interfaces, if multiple interfaces are used.
+   - Set RNET_NUM_INTFC to the number of physical interfaces RNET will use, as determined
+     above.
+   - Create an enum for each physical interface, adding it to rnet_intfc_t
+   - Determine the L2 protocol for each physical interface (PPP, ethernet, etc).
+     NOTE: as of this writing, only PPP is supported.
+   - Add a line in rnet_static_intfc for each interface. Populate it with the information
+     for that interface. Attach a callback function to the tx driver in this line.
+     Determine interface options and set them also.
+   - For each physical interface, create at least one subinterface for that interface.
+     For each subinterface created, add an enum to rnet_subi_t.
+   - Each subinterface, there must be a single line for it in rnet_static_subi.
+     This will specify settings for that subinterface. Fill in those settings. Those
+     settings will specify an IP address, and whether the subinterface is IPv4
+     or IPv6.
+   - Attach the subinterface to an interface by modifying the parent interface's
+     subinterface settings in rnet_static_intfc
+   - Determine what (if any) persistent circuits need to be configured, and create
+     an enum for each (rnet_persist_cir_t).
+   - For each each persistent circuit, a line in rnet_static_cir will have to be
+     created. This line will specify the peer IP address and subnet length, the
+     UDP port number, the subinterface that the circuit is attached to, the
+     message ID (and therefore app) that any rx packet will be sent to, and
+     some other settings such as options.
+   - Select a maximum number of allowable circuits (RNET_NUM_CIR). This must
+     be greater than or equal to the number of persisten circuits. The number of
+     allowable circuits, when greater than the persistent circuits, will permit
+     the RNET stack to create dynamic circuits, as connections are formed by
+     live traffic.
+
+Writing NUFR Project Code
+-------------------------
+This is what needs to be where in the project code: the bringup and BSP code
+and the code which uses NUFR.
+
+> Reset function handler and main()/BG task Function: Recommended Practices
+
+  It is recommended that the following format is followed, irrespective of
+  CPU. Of course, other code will be added to this template below--this
+  is a starting point. The format will follow this codepath:
+
+    void my_reset_handler(void)
+    {
+        // The call to 'bsp_early_init()' does initializations that cannot
+        // wait for later. Some of these are/might be:
+        //    - Changing wait state of FLASH device wherein .text segment lies
+        //    - Changing CPU clock frequency
+        //    - Enabling power to H/W blocks necessary to run code
+        //    - Optional: Disable interrupts at peripheral level
+        //                only necessary for warm restart.
+        bsp_early_init();
+
+        // Insert code here to zero out .bss segment and
+        // to copy initializers over to .data segments
+        [ memset() to zero .bss segment ]
+        [ memcpy() to initialize .data segment ]
+
+        // Enable interrupts in CPU registers, if not already enabled
+        // Do not enable at peripheral yet.
+        [ ... ]
+
+        // Set stack pointer register to the bottom of 'Bg_Stack'
+        // variable (&Bg_Stack[BG_STACK_SIZE])
+
+        main();
+    }
+
+    int main(void)
+    {
+        // Do OS initialization before BSP, so OS is ready to receive
+        // any device messages, etc. once BSP is initialized
+
+        // Initialize NUFR kernel with 'nufr_init().
+        // Each componenet of the SL has an init of its own.
+        // nsvc_init() is master init for SL: it must be first SL init.
+        // You can excluded other SL inits for SL components not used;
+        //     this example shows all SL inits for all SL components.
+        // Initialize RNET stack (rnet_* calls), if RNET stack is used
+        // All NUFR and RNET inits must be called before any
+        //    'nufr_launch_task()' calls.
+        nufr_init();
+
+        nsvc_init();
+        nsvc_msg_bpool_init();
+        nsvc_pcl_init();
+        nsvc_timer_init(<<see quantum timer callbacks mentioned by app timers>>);
+        nsvc_mutex_init();
+        rnet_create_buf_pool();
+        rnet_set_msg_prefix(<<< insert applicable values >>>);
+        rnet_intfc_init();
+
+        // Initialize BSP. System is ready to go now.
+        bsp_init();
+
+        // We are now the BG Task
+
+        // To get app code going, must launch at least one task
+        nufr_launch_task(<<< insert task ID >>>>);
+
+        // BG Task MUST have a while(1) loop in place
+        while (1)
+        {
+            // You may insert code here
+        }
+    }
+
+> Enabling or Disabling Asserts
+
+  1. NUFR asserts ultimately invoke the function 'onContractFailure()' in 'nufr-platform.c'.
+     There must be some content in this function--even just a counter--to ensure that it
+     will be invoked, as the compiler will eliminate it during optimization otherwise.
+     Setting NUFR_ASSERT_LEVEL == 0 will disable all asserts; setting it == 9
+     will enable all asserts; values inbetween will selectively enable asserts.
+
+> Other Mandatory or Recommended Practices
+
+  1. App Timers
+     - Remember to initialize an app timer before using it.
+     - Keep the app timer handle (pointer); don't let lose scope.
+
+
+ARM Board Support Checklist
+---------------------------
+
+> Porting Checklist
+
+  1. Hook up exception vectors
+     - Reset handler
+     - SysTick handler
+     - PendSV handler
+     - Hard Fault handler
+     - Usage Fault handler
+     - Bus Fault handler
+     - Mem Manager handler
+     - The NUFR distro includes this in ./disco/src/exception-vector-table.c 
+
+  2. Set Exception/Interrupt Priorities
+     - Determine how many priority bits your ARM chip has and configure accordingly.
+     - The NUFR distro includes interrupt priority code (./disco/src/exception-priorities.c
+       and ./disco/inc/exception-priorities.h).
+       You can use that if you have no code of your own.
+     - Set priorities accordingly. A set of defaults, if available, will usually work.
+     - Important: make sure that the PendSV is at the lowest priority, and that
+          all other interrupts/exceptions are at a higher priority than PendSV
+     - Recommend: SysTick is at the next priority higher than PendSV and all other
+          interrupts/exceptions at priorities higher than this
+     - Recommend: set fault handlers at highest priority
+     - Make sure some code is put in fault handlers (like counter), otherwise,
+       compiler might optimize-remove the handler
+     - Advanced (default will work): Set the BASEPRI interrupt priority in int_lock()
+       in nufr-platform-import.h
+
+  3. Configure SysTick
+    - Set SysTick timer interval. Make sure you use 'NUFR_TICK_PERIOD' in
+      nufr-platform-export.h in SysTick configuration, so there's a single point
+      of change.
+
+  4. Prepare for call to main()
+    - Initialize .bss and .data segments early on in initializations
+    - Don't use any global variables until this initialize has completed
+    - Initialize Process Stack Pointer (PSP) before switch to process mode
+      Set this to point to the bottom of the BG task stack.
+    - Be sure interrupts are enabled
+    - Change CPU to process mode
+
+
+> Crash Gotcha's
+
+ *** Make sure PendSV priority is lower than SysTick and SysTick is lower than other
+     interrupts. CPU will crash when an app timer expires and SysTick invokes PendSV.
+
+ *** Make sure functions which serve as interrupt vectors in vector table have bit 0 set.
+     If proper assembler directive (type ... %function) isn't used, it won't set bit 0
+     (thumb mode bit). CPU will crash when handler is called.

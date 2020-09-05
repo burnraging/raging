@@ -1,0 +1,16 @@
+
+Windows Pthread Emulation
+-------------------------
+Currently, there is a problem somewhere in the pthread environment. The problem
+is related to context switching after several OS Tick counts. We have not root-caused
+the problem yet.
+
+
+Disco board
+-----------
+pppd won't receive frames from the disco board. Didn't get pppd to finish negotiations.
+
+SSP Linux utility (ssp-framer.cpp) TTY stuff doesn't work.
+
+Latest (6/2019) STM jlink driver won't work with OpenOCD. Difficult to keep module from
+replacing old driver with new driver.

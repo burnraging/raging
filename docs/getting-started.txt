@@ -1,0 +1,497 @@
+========================================
+            Raging Codebase
+========================================
+
+Welcome to the Raging Codebase!
+
+The development environment is Linux, with a few UT environments under Windows.
+The use of Windows is optional.
+
+=======================================================
+            System Installations
+=======================================================
+
+Windows Setup
+-------------
+
+  By "Windows" we mean Visual C++ 2010 Express. This VC 2010 Express is free.
+  Google it and download it. Some of the unit tests (./tests/old-ut) run under VC.
+  Also, the pthread simulation (./tests/simulation) runs under VC. It hasn't been
+  ported to Linux yet.
+
+  There are VC project files saved under ./visual-studio. You should be able to 
+  load these in your VC installation.
+
+  Notes below for "Windows Pthread Emulation/Simulation".
+
+Linux Packages
+----------------
+
+  *** Prerequisite
+
+      sudo apt-get update
+      sudo apt-get upgrade
+
+  *** CMake packages
+
+      sudo apt install cmake ninja-build
+
+  *** To Build NUFR + RNET Stack
+
+       (1) ARM targets, Ubuntu 16.04 and earlier
+
+           sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
+           sudo apt install gdb-arm-none-eabi
+           sudo apt install gcc-arm-none-eabi
+           (??is this correct or necessary) sudo apt-get install gcc-arm-embedded
+
+       (2) ARM targets, Ubuntu 18.04
+
+           Can no longer use the above, so using the ARM gcc toolset, instead of the multiarch toolset
+
+           [a] Download the ARM toolchain from...
+               https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
+               ...I'm using 7-2017-q4 major "Tar Ball"
+
+           [b] Recommendation is to add a bin directory and install toolchain there.
+               For example, add /home/me/bin
+
+           [c] cd over to /home/me/bin and do next commands there
+
+           [d] Unarchive tarball that you just downloaded.
+                 tar -xvf gcc-arm-none-eabi-7-2017-q4-major-linux.tar.bz2
+               Un-tarball was file 'gcc-arm-none-eabi-7-2017-q4-major-linux.tar.bz2'
+               This will create a directory under /home/me/bin called 'gcc-arm-none-eabi-7-2017-q4-major'
+
+           [e] Make a soft link to that directory:
+               ln -s gcc-arm-none-eabi-7-2017-q4-major arm-none-current
+               ...Which ofcourse gives me a new directory: 'arm-none-current'
+
+           [f] Edit the PATH variable in profile file (/home/me/.profile), adding the new path.
+               Line added between '####' commented lines in .profile:
+
+                    # set PATH so it includes user's private bin if it exists
+                    if [ -d "$HOME/bin" ] ; then
+                        PATH="$HOME/bin:$PATH"
+                        ###### Add start
+                        PATH="$HOME/bin/arm-none-current/bin:$PATH"
+                        ###### Add end
+                    fi
+
+           [g] Source new PATH
+
+           [h] Verify that you've done everything correctly by invoking the newly installed compiler.
+               After sourcing new path, from any directory, as a test execute:
+                  arm-none-eabi-gcc --version
+               ...which will show you the version of the GCC compiler you just installed.
+
+
+           [i] Install this/these additional package(s):
+
+               sudo apt install make
+               sudo apt install build-essential
+
+       (3) MSP430 targets, Ubuntu 18.04
+           
+
+           [a] Using the Texas Instruments GCC compiler: http://www.ti.com/tool/MSP430-GCC-OPENSOURCE
+               In my case: msp430-gcc-full-linux-x64-installer-6.0.1.0.run
+
+           [b.1] ***** CMAKE METHOD *****
+               Install compiler in similar manner to installation for ARM compiler.
+               You must update your path to include the msp430 gcc compiler.
+               The symbolic link method that used to work for 'make' will not work with CMake.
+               (After making these changes, you must log out then log back in in order
+                to get them pushed out.)
+
+                export PATH="$PATH:/home/bmw/bin/msp430-gcc-6.0.1.0/bin"
+                export MSP430_GCC_INCLUDE_DIR=/home/bmw/bin/msp430-gcc-6.0.1.0/include
+
+
+           [b.2] ****** MAKE METHOD
+               [not used anymore, should not be needed]
+               Install compiler in similar manner to installation for ARM compiler.
+               In other words, the MSP430 cross-compiler will have symbolic links in the new 'bin'
+               directory. If haven't installed the ARM compiler, you will have to add the path
+               specified by that install.
+               -- If you haven't installed the ARM compiler, append to the path, to
+                  include ${HOME}/bin/   (for me, this is /home/me/bin/)
+               -- Install in ${HOME}/bin/msp430-gcc-6.0.1.0/
+               -- In ${HOME}/bin/, add the following symbolic links:
+                     ln -s msp430-gcc-6.0.1.0/bin/msp430-elf-gcc msp430-elf-gcc
+                     ln -s msp430-gcc-6.0.1.0/bin/msp430-elf-as msp430-elf-as
+                     ln -s msp430-gcc-6.0.1.0/bin/msp430-elf-objdump msp430-elf-objdump
+                     ln -s msp430-gcc-6.0.1.0/bin/msp430-elf-size msp430-elf-size
+                     ln -s msp430-gcc-6.0.1.0/bin/msp430-elf-objcopy msp430-elf-objcopy
+                     ln -s msp430-gcc-6.0.1.0/bin/msp430-elf-gdb msp430-elf-gdb
+
+           [c] Add the include path variable. This is according to TI's gcc manual.
+               Use below and change as appropriate.
+                  export MSP430_GCC_INCLUDE_DIR=${HOME}/bin/msp430-gcc-6.0.1.0/include
+               Add this to your .profile file
+
+
+  *** New UT Environment
+
+      (You'll need this to get a 'make all' to complete all builds with no errors)
+
+      [new form] sudo apt-get install libcunit1-dev
+      [old form] sudo apt-get install libcunit1
+      [old form] sudo apt-get install libcunit-dev
+      sudo apt-get install gcovr
+
+      ( Optional Python pip
+          sudo apt install python-pip
+          pip install gcovr
+      )
+
+  *** Optional Development Tools
+
+      sudo apt install ddd
+      sudo apt install screen
+      sudo apt-get install flawfinder
+      sudo apt-get install cppcheck
+      sudo apt-get install mercurial
+      sudo apt-get install meld
+      sudo apt-get install cscope
+      sudo apt-get install ctags
+      sudo apt-get install cppcheck-gui
+      sudo apt-get install doxygen-gui
+      sudo apt-get install doxygen-latex
+      sudo apt-get install tortoisehg
+      sudo apt-get install tortoisehg-nautilus
+      sudo apt-get install vim-gnome
+      sudo apt-get install libcunit1-ncurses
+      sudo apt-get install libcunit1-ncurses-dev
+
+  *** To Generate Documentation
+
+      sudo apt-get install doxygen
+      sudo apt-get install graphviz
+
+  *** QEMU Emulation for ARM
+
+      sudo apt-get install qemu-system-arm
+
+  *** STMicro Discovery Board Project ST-LINK (ARM-based)
+
+      sudo apt install openocd
+
+=======================================================
+            Builds and Makes
+=======================================================
+
+Raging Base Directory
+---------------------
+
+Clone or copy the entire Raging distribution over to some directory on your
+linux machine. All commands will be run from there, unless otherwise noted.
+
+If the clocks on your source and destination machines aren't synchronized
+completely, CMake will display a "clock skew" error message at the end of its
+make. Make will fail if this occurs. You must touch all the files to fix this:
+
+cd to nufr root dir
+find . -exec touch {} +
+
+
+Linux CMake System
+------------------
+
+CMake uses 'make' command as front-end CLI argument. The following targets are supported:
+
+bmw@bmw-vm:~/sandbox/nufr-code$ make 
+all                    clean                  qemu                   size-qemu              sspsanitytool          verbose-msp430-simple
+all-disco              disco                  sim                    speed-disco            testrun                verbose-qemu
+all-msp430-simple      gatewaytool            size-disco             speed-msp430-simple    verbose-disco          verbose-sim
+all-qemu               msp430-simple          size-msp430-simple     speed-qemu             verbose-gatewaytool    verbose-sspsanitytool
+bmw@bmw-vm:~/sandbox/nufr-code$ make 
+
+There are 3 kinds of optimization modes which you can make for:
+1. Debug
+2. Speed
+3. Size
+The default is debug (i.e. 'make disco' will build the debug output). The other two are prepended by
+speed-* or size-*
+
+The verbose-* targets are for troubleshooting make problems. They make the debug image.
+
+The PC tools are built in debug mode only.
+
+The output of the make is put in ./builds/target, where 'target' is the make target. 3 folders
+will get placed in 'target': a debug, a speed, and a size.
+
+Making Doxygen
+--------------
+  cd to raging root dir
+  doxygen docs/raging.doxyfile
+
+
+=======================================================
+            Included Projects
+=======================================================
+
+QEMU Knight Rider Project
+-------------------------
+
+By default, the qemu project is an app called "Knight Rider", found in 'messager.c'.
+The QEMU project source files are in ./tests/qemu/. The QEMU environment emulates a
+Cortex M3.
+
+To build and run the QEMU Knight Rider project:
+
+(1) Build the debug version of the qemu project
+     make qemu
+        --or alternatively: make verbose-gdb
+(2) Start the qemu system server
+    qemu-system-arm -M lm3s6965evb -nographic --kernel build/qemu/debug/qemu-binary.elf -S -gdb tcp::1234
+
+(3) Launch gdb (or ddd) into the qemu server
+    arm-none-eabi-gdb build/qemu/debug/qemu-binary.elf
+        -- or --
+    ddd build/qemu/debug/qemu-binary.elf
+
+(4) Start into gdb. As an exercise, set breakpoints and watch them hit.
+      (gdb) target remote localhost:1234
+      (gdb) load
+      (gdb) break main
+      (gdb) break entry_event_task
+      (gdb) continue
+
+(5) You must kill and restart the gdb server each time you remake the qemu target.
+    You can kill the server from within gdb:
+      (gdb) kill
+    ...or you can kill it from the linux prompt
+       pkill qemu-system-arm
+
+
+Disco Board Project
+-------------------
+The "Disco Board" is the STMicro Discovery Board. It was used as the target h/w plaform
+on which NUFR and RNET was demonstrated. The disco board features an STM32F40 microcontroller
+(SoC), which runs an ARM Cortex M4.
+
+  Hardware:
+        STM32F4-Discovery Board with ST-LINK/V2 Debugger
+        Prolific USB TTL-USB Adapter
+        FTDI USB to Serial Adapter
+
+  Linux hosts:
+        Ubuntu 16.04 LTS, native install
+        Ubuntu 16.04 as a Virtual Box guest on a Windows 7 host
+
+  NOTE: pppd will only work with some serial USB adapters!
+        Prolific TTL-USB adapter wouldn't work with pppd, for example
+
+  Pinout of Prolific USB serial connector. If you choose a different vendor/model for the
+  USB serial connector, make sure it is a 3.3v model.
+     Black-- ground
+     Red--   3.3vdc
+     White-- Rx
+     Green-- Tx
+  Connecting USB serial connector to disco board.
+    This will wire it to to IRQ 38 (see enum USART2_IRQn in code):
+     Black ==> GND
+     Red   ==> (unconnected)
+     Green ==> PA3
+     White ==> PA2
+
+  All disco board operations are in linux. Packages:
+        sudo apt-get install openocd
+
+  Building the disco app:
+        In your working directory...
+        make rebuild all
+
+  Establishing a debug connection to the disco board (NOTE: requires a dedicated terminal):
+        openocd -f disco/disco.cfg
+
+  !6/2019: Latest STM disco board driver is broken, won't work with OpenOCD.
+           See notes below on using Segger JLink.
+
+  Running GDB over the debug connection (NOTE: requires a dedicated terminal):
+        arm-none-eabi-gdb build/disco/debug/disco-binary.elf
+        target remote localhost:3333
+        monitor reset halt
+        load
+        monitor reset halt
+        [commence with GDB commands]
+
+        ...Alternately, to launch ddd instead of gdb:
+        ddd --debugger arm-none-eabi-gdb build/disco/debug/disco-binary.elf
+
+  To establish a network connection to the disco board (NOTE: requires a dedicated terminal).
+         1) Launch the disco application either by connecting through gdb and hitting 'continue' or
+            by allowing disco board to run without a debug connection. If in gdb, make sure
+            you are not halted.
+
+         2) Ensure that the USB serial connection appears as a linux device (/dev/ttyUSB0)
+
+         3) Run pppd using this commmand:
+                sudo pppd -detach lcp-echo-interval 0 debug noauth nopcomp noaccomp nocrtscts noip ipv6 ::1,::2 /dev/ttyUSB0 115200
+            As the PPP session negotiates, pppd will print log messages of the negotiation packets.
+
+         4) After pppd successfully negotiates up, run 'ifconfig -a' to verify that a new interface
+            called 'PPP0' has been created. Its IP address will be FE80::1.
+
+         5) You can now ping the disco board:
+                ping6 FE80::2
+
+
+MSP430 Project
+--------------
+
+  Hardware:
+      MSP430F5529 USB LaunchPad Evaluation Kit (http://www.ti.com/tool/MSP-EXP430F5529LP)
+
+  To build:
+      make msp430-simple
+
+  (Substitute your version of msp430 gcc for version 6.0.1.0 specified below)
+  (Assumes msp430 gcc was installed according to instructions above)
+  To connect to Launchpad board:
+    (1) Plug in usb cable to Launchpad board
+    (2) Connect to it using:
+       sudo ${HOME}/bin/msp430-gcc-6.0.1.0/bin/gdb_agent_console ${HOME}/bin/msp430-gcc-6.0.1.0/msp430.dat
+    (3) This opens a listening port on the default TCP port 55000
+
+  Once connected, run gdb:
+    (1) cd to root raging directory
+    (2) msp430-elf-gdb ./build/msp430-simple/debug/msp430-simple.elf
+    (3) target remote localhost:55000
+    (4) NOTE: first time you connect, agent will download new firmware.
+        Wait for it to complete, disconnect you. Exit gdb, then restart and repeat.
+    (5) load
+    (6) cont
+    (7) Useful commands:
+          monitor reset
+          monitor halt
+
+Windows Pthread Emulation/Simulation
+------------------------------------
+
+The windows pthread emulation is a simulation of the NUFR kernel on a multi-threaded
+pthread API layer. Each task is mapped to its own pthread, so that windows creates
+multiple threads to emulate multiple tasks. In the pthread environment, however, each
+only one thread is permitted to run at a time. The Visual C++ 2010 Express debugger
+allows one to navigate acrosss the various threads, viewing any tasks's frame.
+The Visual Studio project file for the windows pthread emulation is found
+under ./visual-studio/simulation/.
+
+The pthread simulation relies on an open-source pthread DLL. This must be installed
+in windows before building and running the simulation. Instructins are in the file
+ ./visual-studio/pthreads-install-notes.txt.
+
+We have yet to port the pthread emulation environment over to linux. Since the
+windows simulation uses standard pthread API calls, the port should not be exceedingly
+difficult.
+
+The pthreads simulation was used to test the NUFR kernel API calls which resulted in
+a context switch. It allowed me to test task interactions, OS Tick interactions,
+and other functionality which spans threads. It is a useful, powerful environment.
+Although I never used it to test application code, there is nothing to prevent
+an application engineer from testing his or her code in this environment, before
+moving to actual hardware.
+
+RNET Single-Task Simulation and UT Environment
+----------------------------------------------
+
+I developed a single-task NUFR simulation to test the RNET stack. This is the Visual
+C++ project ./visual-studio/ut-rnet/ and the files ./test/rnet-ut/. This environment
+mocks the NUFR kernel with a simple single-task message management setup. Obviously,
+there are limitations to what it can do. But it did allow me to run the NUFR platform
+layer and the NUFR SL as-is in the test environment.
+
+This single-task simulation environment could be used an an application developer
+to test an application or driver whose tasking interface consists solely of NUFR
+messaging. NUFR steers developers towards this model, so this simulation environment
+could be quite useful to an application developer. It allowed me to test RNET in
+almost its entirety.
+
+There are compile switches in rnet-compile-switches.h which turn on loopbacking
+in the RNET stack. The RNET UT code creates two interfaces. For the PPP negotiation
+testing, packets were sent from one interface to another, so that both RNET interfaces
+talked to each other and negotiated a PPP session as two remote peers.
+
+
+UT Test Environments
+--------------------
+
+There is a hodge-podge of UT environments in the raging distribution. This is
+an area that Chris and I had plans for but those plans fell by the wayside.
+There are a few UT environments, some on windows and some on linux. There's a full
+UT testing environment on linux, and the intention is--someday--to migrate all
+of our UT code over to. An older linux UT and a newer linux UT environment
+exist. Then there are a few ad-hoc UT environments in windows. In these ad-hoc
+environments, there are several commented-out function calls in the main()
+function. These commented-out calls where tested one at a time, and commented
+out upon successful completion. If I need to regress something, I go back and
+un-comment out the function call that tests that area and run that suite of
+tests.
+
+===============================
+    Other
+===============================
+
+Segger JLink
+------------
+Instructions on how to convert Discovery Board to use Segger JLink instead of STLink:
+https://www.segger.com/products/debug-probes/j-link/models/other-j-links/st-link-on-board/
+
+Segger GDB and GDB servers that support Segger JLink:
+https://www.segger.com/products/debug-probes/j-link/tools/j-link-gdb-server/about-j-link-gdb-server/
+  1. Download JLink software.
+     Do not run install wizard. You should have downloaded an install file like: JLink_Linux_x86_64.deb
+  2. Install JLink software
+       sudo apt install path_and_name_of_file such as:
+            sudo apt install /home/bernie/Downloads/JLink_Linux_x86_64.deb
+                    -or-
+            sudo apt install /tmp/mozilla_bmw0/JLink_Linux_x86_64.deb
+  3. Use GDB Server:
+       [ mine installed to /opt/SEGGER/JLink_V646g/ ]
+       Execute one or the other of these 2:
+       To execute server with GUI settings: /opt/SEGGER/JLink_V646g/Jlink_software/JLinkGDBServerExe
+       To execute server with CLI settings: /opt/SEGGER/JLink_V646g/Jlink_software/JLinkGDBServerCLExe
+       *** This is the server I'm running
+          /opt/SEGGER/JLink_V646g/JLinkGDBServerCLExe -select USB -device STM32F407VG -endian little -if SWD -speed 50000 -noir -LocalhostOnly
+  4. Connect to GDB Server on port: 2331
+       [assume root dir is nufr-code]
+       [cd nufr-code]
+       arm-none-eabi-gdb build/disco/debug/disco-binary.elf
+                   - OR -
+       ddd --debugger arm-none-eabi-gdb build/disco/debug/disco-binary.elf
+                   - THEN -
+       target remote localhost:2331
+       load
+       break main
+   5. Other useful GDB commands for Segger:
+         monitor help
+
+Segger Ozone J-Link Debugger
+----------------------------
+https://www.segger.com/products/development-tools/ozone-j-link-debugger/
+   1. Download appropriate version.
+      Download file will be something like: Ozone_Linux_V262e_x86_64.deb
+      Assume Firefox downloads file to ~/Downloads/Ozone_Linux_V262e_x86_64.deb
+   2. Instead of running installer, run:
+          sudo apt install ~/Downloads/Ozone_Linux_V262e_x86_64.deb
+   3. Launch Ozone. Project Wizard will pop up.
+      This video will walk you through the subsequent steps: https://youtu.be/tpew0lEC3U8
+   4. In Project Wizard...
+         Project Wizard > Device
+            STM32F407VG
+         Peripherals (optional)
+            ./disco/lib/svd/STM32F4_svd_V1.2/STM32F407.svd
+         Target Interface
+            SWD, Target Interface Speed = 50Mhz
+         Host Interface
+            USB, Serial Number = [leave blank]
+         Program to be debugged (ELF, Motorola, etc)
+            ./build/disco/debug/disco-binary.elf
+
+       << IF NOT USING PROJECT WIZARD >>
+        Target Intfc = SWD
+        Speed = 50 MHz
+        Target = USB
+        Selected Device = STM32F407IG (my disco board)
+        Program to be debugged = ./build/disco/debug/disco-binary.elf

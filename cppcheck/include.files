@@ -1,0 +1,9 @@
+/usr/arm-none-eabi/include/
+/usr/arm-none-eabi/include/sys/
+/usr/arm-none-eabi/include/newlib-nano/
+/usr/arm-none-eabi/include/machine/
+/usr/lib/gcc/arm-none-eabi/7.2.1/include/
+/usr/include/
+/usr/include/x86_64-linux-gnu/
+includes/
+platform/gcc/unit_test/

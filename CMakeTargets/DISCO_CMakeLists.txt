@@ -1,0 +1,161 @@
+cmake_minimum_required(VERSION 3.0.0)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("Building Debug version of Firmware...")
+    set(opt_level -O0)
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Size)
+     message("Building Release Size version of Firmware...")
+     set(opt_level -Os)
+endif()
+    
+if(CMAKE_BUILD_TYPE MATCHES Speed)
+     message("Building Release Speed version of Firmware...")
+     set(opt_level -O2)
+endif()
+        
+    
+#   Search for any CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
+#   Project Settings
+set(app_name "disco-binary")
+set(elf_file ${app_name}.elf)
+set(bin_file ${app_name}.bin)
+set(hex_file ${app_name}.hex)
+set(map_file ${app_name}.map)
+set(lst_file ${app_name}.lst)
+
+#   Project name, uses C, C++ and Assembly
+project(${app_name} C ASM)
+
+# core flags
+set(CORE_FLAGS -mthumb -mcpu=cortex-m4 -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork --specs=nano.specs --specs=nosys.specs ${ADDITIONAL_CORE_FLAGS})
+
+#   STM Processor Type
+#set(DEVICE_FAMILY STM32F429_439xx)
+
+#   External Crystal in MHz
+set(HSE_VALUE 8000000)
+
+#   Linker File
+get_filename_component(LINKER_SCRIPT arm-projects/disco/LinkerScript.ld ABSOLUTE)
+
+
+#   Add sources
+set(sources
+    #   Optional compile- run-time checks
+    sources/nufr-sanity-checks.c
+    
+    #   NUFR Platform Sources
+    nufr-platform/small-soc/nufr-platform.c
+    
+    #   Platform Sources
+    platform/ARM_CMx/gcc/nufr-context-switch.s
+    platform/ARM_CMx/gcc/assembly.s
+    platform/ARM_CMx/gcc/armcmx-utils-mem.c
+    platform/ARM_CMx/gcc/Reset_Handler.c
+    platform/ARM_CMx/Prepare_Stack.c
+    platform/ARM_CMx/SysTick_Handler.c
+    
+    #   NUFR RTOS Sources
+    sources/nufr-kernel-messaging.c
+    sources/nufr-kernel-message-blocks.c
+    sources/nufr-kernel-task.c
+    sources/nufr-kernel-timer.c
+    sources/nufr-kernel-semaphore.c
+    
+    #   NUFR Service Layer Sources
+    sources/nsvc.c
+    sources/nsvc-globals.c
+    sources/nsvc-messaging.c
+    sources/nsvc-mutex.c
+    sources/nsvc-pcl.c
+    sources/nsvc-pool.c
+    sources/nsvc-timer.c
+    
+    #   Raging Utility Sources
+    sources/raging-utils.c
+    sources/raging-utils-crc.c
+    sources/raging-utils-os.c
+    sources/raging-utils-scan-print.c
+    
+    #   RNET Sources
+    sources/rnet-ahdlc.c
+    sources/rnet-crc.c
+    sources/rnet-dispatch.c
+    sources/rnet-icmp.c
+    sources/rnet-intfc.c
+    sources/rnet-ip.c
+    sources/rnet-ip-utils.c
+    sources/rnet-ppp.c
+    sources/rnet-top.c
+    sources/rnet-udp.c
+    
+    #   SSP Sources
+    sources/ssp-driver.c
+    
+    #   NVM Sources
+    sources/nvm-tag.c
+    
+    #   STM Peripheral Driver Sources
+    arm-projects/disco/lib/StdPeriph_Driver/src/misc.c
+    arm-projects/disco/lib/StdPeriph_Driver/src/stm32f4xx_gpio.c
+    arm-projects/disco/lib/StdPeriph_Driver/src/stm32f4xx_rcc.c
+    arm-projects/disco/lib/StdPeriph_Driver/src/stm32f4xx_usart.c
+    
+    #   Disco project Sources
+    arm-projects/disco/src/base-task.c
+    arm-projects/disco/src/bsp.c
+    arm-projects/disco/src/crash-dump-stm.c
+    arm-projects/disco/src/exception-crash-handlers.c
+    arm-projects/disco/src/exception-default-handlers.c
+    arm-projects/disco/src/exception-priorities.c
+    arm-projects/disco/src/exception-vector-table.c
+    arm-projects/disco/src/main.c
+    arm-projects/disco/src/nsvc-app.c
+    arm-projects/disco/src/nufr-platform-app.c
+    arm-projects/disco/src/nvm-disco-test.c
+    arm-projects/disco/src/nvm-disco.c
+    arm-projects/disco/src/nvm-stm32f4xx.c
+    arm-projects/disco/src/rnet-app.c
+    arm-projects/disco/src/rx-driver.c
+    arm-projects/disco/src/system.c
+    arm-projects/disco/src/tx-task.c
+    
+    )
+
+set(elf_file ${app_name}.elf)
+
+add_executable(${elf_file} ${sources})
+
+target_include_directories(${elf_file} PUBLIC includes)
+target_include_directories(${elf_file} PUBLIC nufr-platform/small-soc)
+target_include_directories(${elf_file} PUBLIC arm-projects/disco/inc)
+target_include_directories(${elf_file} PUBLIC arm-projects/disco/lib/CMSIS/core)
+target_include_directories(${elf_file} PUBLIC arm-projects/disco/lib/CMSIS/device)
+target_include_directories(${elf_file} PUBLIC arm-projects/disco/lib/StdPeriph_Driver/inc)
+
+#target_compile_definitions(${elf_file} PUBLIC NUFR_ASSERT_LEVEL=9)
+target_compile_definitions(${elf_file} PUBLIC DEBUG)
+target_compile_definitions(${elf_file} PUBLIC USE_STDPERIPH_DRIVER)
+target_compile_definitions(${elf_file} PUBLIC USE_FULL_ASSERT)
+
+set(additional_compiler_flags ${CORE_FLAGS} ${opt_level})
+target_compile_options(${elf_file} PRIVATE ${additional_compiler_flags})
+
+set(additional_linker_flags -Wl,-Map=${map_file},--cref,--no-warn-mismatch -nostdlib)
+target_link_libraries(${elf_file} PRIVATE ${additional_linker_flags})
+target_link_libraries(${elf_file} PUBLIC "-g -Wl,--gc-sections")
+target_link_libraries(${elf_file} PUBLIC -T${LINKER_SCRIPT})
+
+add_custom_target(size DEPENDS ${elf_file} COMMAND ${ARM_SIZE_EXECUTABLE} -B ${elf_file}) 
+add_custom_target(bin DEPENDS ${elf_file} COMMAND ${ARM_OBJCOPY_EXECUTABLE} -Obinary ${elf_file} ${bin_file})
+add_custom_target(list DEPENDS ${elf_file} COMMAND ${ARM_OBJDUMP_EXECUTABLE} -S ${elf_file} > ${lst_file})
+add_custom_target(hex DEPENDS ${elf_file} COMMAND ${ARM_OBJCOPY_EXECUTABLE} -Oihex ${elf_file} ${hex_file})
+add_custom_target(dump DEPENDS ${elf_file} COMMAND ${ARM_NM_EXECUTABLE} -A -C -td --reverse-sort --size-sort ${elf_file} | head -n20 | cat -n)
+
+
+
+

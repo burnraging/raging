@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{63F9E459-DA27-4175-AE55-01F83F780D00}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>simulation</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Bernie\raging\nufr-code\tests\simulation;E:\Bernie\raging\nufr-code\nufr-platform\pc-pthread;E:\Bernie\raging\nufr-code\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\nufr-platform\pc-pthread\nufr-platform.c" />
+    <ClCompile Include="..\..\nufr-platform\pc-pthread\Prepare_Stack.c" />
+    <ClCompile Include="..\..\sources\nsvc-globals.c" />
+    <ClCompile Include="..\..\sources\nsvc-messaging.c" />
+    <ClCompile Include="..\..\sources\nsvc-mutex.c" />
+    <ClCompile Include="..\..\sources\nsvc-pcl.c" />
+    <ClCompile Include="..\..\sources\nsvc-pool.c" />
+    <ClCompile Include="..\..\sources\nsvc-timer.c" />
+    <ClCompile Include="..\..\sources\nsvc.c" />
+    <ClCompile Include="..\..\sources\nufr-kernel-message-blocks.c" />
+    <ClCompile Include="..\..\sources\nufr-kernel-messaging.c" />
+    <ClCompile Include="..\..\sources\nufr-kernel-semaphore.c" />
+    <ClCompile Include="..\..\sources\nufr-kernel-task.c" />
+    <ClCompile Include="..\..\sources\nufr-kernel-timer.c" />
+    <ClCompile Include="..\..\sources\nufr-simulation.c" />
+    <ClCompile Include="..\..\sources\raging-utils-mem.c" />
+    <ClCompile Include="..\..\sources\raging-utils.c" />
+    <ClCompile Include="..\..\tests\simulation\nsvc-app.c" />
+    <ClCompile Include="..\..\tests\simulation\nufr-platform-app.c" />
+    <ClCompile Include="..\..\tests\simulation\pthread-main.c" />
+    <ClCompile Include="..\..\tests\simulation\ut-pthread.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\includes\nsvc-api.h" />
+    <ClInclude Include="..\..\includes\nsvc-messaging.h" />
+    <ClInclude Include="..\..\includes\nsvc.h" />
+    <ClInclude Include="..\..\includes\nufr-api.h" />
+    <ClInclude Include="..\..\includes\nufr-global.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-base-messaging.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-base-semaphore.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-base-task.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-message-blocks.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-message-send-inline.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-semaphore-inlines.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-semaphore.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-task-inlines.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-task.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel-timer.h" />
+    <ClInclude Include="..\..\includes\nufr-kernel.h" />
+    <ClInclude Include="..\..\includes\nufr-simulation.h" />
+    <ClInclude Include="..\..\includes\raging-contract.h" />
+    <ClInclude Include="..\..\includes\raging-global.h" />
+    <ClInclude Include="..\..\includes\raging-utils.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-pthread\nufr-compile-switches.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-pthread\nufr-platform-export.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-pthread\nufr-platform-import.h" />
+    <ClInclude Include="..\..\nufr-platform\pc-pthread\nufr-platform.h" />
+    <ClInclude Include="..\..\tests\qemu\nufr-platform-app-compile-switches.h" />
+    <ClInclude Include="..\..\tests\qemu\nufr-platform-app.h" />
+    <ClInclude Include="..\..\tests\simulation\nsvc-app.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

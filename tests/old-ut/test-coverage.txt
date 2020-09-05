@@ -1,0 +1,243 @@
+          ====================================
+           Lists of Tests by Functional Area
+          ====================================
+
+*** UT Tests of internal fcns ***
+
+nufrkernel_add_task_to_ready_list()
+nufrkernel_delete_task_from_ready_list()
+nufrkernel_block_running_task()
+   ut-nufr-task.c : test_exercise_ready_list1()
+   task_priority_test.c
+   ready_list_insert_tests.c
+   ready_list_delete_tests.c
+   ready_list_remove_head_tests.c
+   block_running_task_tests.c
+
+
+nufrkernel_sema_link_task()
+nufrkernel_sema_unlink_task()
+   ut-nufr-semaphore.c
+
+nufrkernel_add_to_timer_list()
+nufrkernel_purge_from_timer_list()
+nufrplat_systick_handler()
+   ut-nufr-timer.c
+
+*** UT Tests of nufr APIs
+
+nufr_task_launch()
+   read_list_tests.c
+
+nufr_prioritize()
+nufr_unprioritize()
+   task_priority_test.c
+
+nufr_change_task_priority()
+   task_priority_tests.c
+
+nufr_yield()
+   ready_list_test.c
+
+nufr_sleep()
+   ready_list_tests.c
+   ut-nufr-task.c
+
+nufr_bop_get_key()
+nufr_bop_waitW()
+nufr_bop_waitT()
+nufr_bop_lock_waiter()
+nufr_bop_unlock_waiter()
+   bop_tests.c
+
+*** UT Tests of SL app timers
+
+nsvc_timer_start()
+nsvc_timer_kill()
+nsvc_timer_os_tick_callin()
+
+*** UT Tests of SL Pool
+
+nsvc_pool_init()
+nsvc_pool_allocate()
+nsvc_pool_free()
+
+*** UT Tests of SL Particles
+
+nsvc_pcl_init()
+nsvc_pcl_alloc_chainWT()
+nsvc_pcl_lengthen_chainWT()
+nsvc_pcl_write_data_no_continue()
+nsvc_pcl_write_data_continue()
+nsvc_pcl_write_dataWT()
+nsvc_pcl_set_seek_to_absolute_offset()
+nsvc_pcl_read()
+
+*** Pthread Tests ***
+
+TEST_SLEEP_AND_SEND
+
+  nufr_launch_task()
+  nufr_sleep()
+  nufr_msg_getW()
+  nsvc_msg_bpool_getW()
+  nsvc_msg_send_structW()
+  nsvc_msg_bpool_free()
+// Exercises:
+// - the different combinations of SL message sends and gets
+// - messages are sent in one order, received by message priority,
+//    not order sent in
+// - message optional parameter verified
+// - message priority intact after send
+// - message sending task verified
+// - do-nothing nufr_yield() 
+// - nufr_yield() which yields to another task
+// - context switching from task sending message to a task
+//    running at a higher priority
+// - no context switch when task sends message to task at same
+//    priority
+// - message send return values ok
+// 
+
+TEST_MSG_CIRCLE
+
+  nufr_launch_task()
+  nsvc_msg_get_structW()
+  nsvc_msg_send_structW()
+  nsvc_msg_bpool_getW()
+  nufr_msg_send_by_block()
+  nufr_self_tid()
+// Exercises:
+// - the different combinations of SL message sends and gets
+// - messages are sent in one order, received by message priority,
+//    not order sent in
+// - message optional parameter verified
+// - message priority intact after send
+// - message sending task verified
+// - do-nothing nufr_yield() 
+// - nufr_yield() which yields to another task
+// - context switching from task sending message to a task
+//    running at a higher priority
+// - no context switch when task sends message to task at same
+//    priority
+// - message send return values ok
+// 
+
+
+TEST_BOPS
+
+  nufr_launch_task()
+  nufr_bop_get_key()
+  nufr_bop_send_with_key_override()
+  nsvc_msg_sendW()
+  nufr_yield()
+  nsvc_msg_get_structW()
+// Exercises:
+// - bop key obtained
+// - task waiting on bop not released if key is incorrect
+// - task waiting on bop released if key is correct
+// - bop key override
+// - bop wait abort due to message send
+// - messages received first by order they're sent,
+//    second, in order that they're received
+//
+
+TEST_BOP_FEATURES
+
+  nsvc_msg_get_structW()
+  nufr_bop_lock_waiter()
+  nufr_bop_unlock_waiter()
+  nufr_bop_send()
+  nufr_bop_get_key()
+  nufr_bop_waitW()
+  nufr_bop_waitT()
+  nsvc_msg_get_structT()
+  nufr_local_struct_set()
+  nufr_local_struct_get()
+  nsvc_msg_send_structW()
+
+  bop lock/unlock waiters tested for both lock and not-lock conditions.
+  nufr_bop_waitT() tested for message abort
+  nufr_bop_waitW() tested for message abort
+  nufr_bop_waitT() tested with pre-arrived bop get before timeout
+  nsvc_msg_get_structT() tested with timeout==0/message pre-arrived
+
+
+TEST_PRIORITY_INVERSION
+
+  nufr_bop_get_key()
+  nufr_bop_waitT()
+  nufr_yield()
+  nsvc_mutex_getT()
+  nsvc_mutex_getW()
+  nsvc_mutex_release()
+  nufr_bop_send()
+  nsvc_msg_sendW()
+  nsvc_msg_get_structT()
+  nufr_msg_peek()
+  nufr_msg_drain()
+  nufr_self_tid()
+  
+  nsvc_mutex_getW() tested for message abort
+  nsvc_mutex_getT() tested for message abort
+  nsvc_mutex_getT() tested in block waiting mode
+  nsvc_mutex_getW() tested for priority inversion
+  nsvc_mutex_release() tested in priority inversion release
+  nufr_msg_drain() tested for single message drain
+
+
+TEST_ZOMBIE_TIMERS
+
+  nufr_yield()
+  nsvc_msg_sendW()
+  nsvc_mutex_getW()
+  nsvc_mutex_release()
+  nufr_bop_send()
+  nsvc_msg_get_structT()
+  nsvc_mutex_getT()
+  nufr_bop_get_key()
+  nufr_bop_waitT()
+
+  nsvc_msg_get_structT(), nsvc_mutex_getT(), nufr_bop_waitT() do not
+    time out, but get their msg/mutex/bop before timeout
+
+
+TEST_API_TIMEOUTS
+
+  nsvc_msg_get_structT()
+  nsvc_mutex_getT()
+  nufr_bop_waitT()
+
+
+  nsvc_msg_get_structT(), nsvc_mutex_getT(), nufr_bop_waitT() all time out
+
+
+TEST_MISC
+
+  nsvc_msg_sendW()
+  nufr_msg_drain()
+  nufr_change_task_priority()
+
+  nufr_msg_drain() exercised more completely
+  
+******************************
+   NEED TEST COVERAGE FOR...
+******************************  
+
+Pthreads:
+
+  other task-related...
+- nufr_task_running_state()
+- nufr_kill_task() (?possible?)
+
+  featurettes....
+o bop key pre-arrival for nufr_bop_waitW() only (nufr_bop_waitT() done already)
+o nufr_sleep() msg abort
+
+- pthreads
+- pthreads SL timer
+- pthreads pcl's
+
+UT tests:
+
+- more pcl testing

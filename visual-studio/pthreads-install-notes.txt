@@ -1,0 +1,16 @@
+              Visual Studio 2010 Express Install
+              ==================================
+
+-- Put the following files in C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include
+    pthread.h, sched.h, semaphore.h
+
+-- C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin
+pthreadVC2.dll
+
+
+-- C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib
+pthreadVC2.lib
+
+-- Under 'Solution' there is a project listed ('simulation' in this case). Right-click on it, select
+   Configuration Properties > Linker > Input > Additional Dependencies
+   Pull drop-down menu, select <Edit...>, add 'pthreadVC2.lib'

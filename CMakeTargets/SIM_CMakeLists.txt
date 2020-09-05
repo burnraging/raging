@@ -1,0 +1,67 @@
+cmake_minimum_required(VERSION 3.0.0)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("Building Debug version of Firmware...")
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+     message("Building Release version of Firmware...")
+endif()
+
+#   Search for any CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
+#   Project Settings
+set(app_name "simulator")
+
+#   Project name, uses C, C++ and Assembly
+project(${app_name} C )
+
+set(sources
+
+	#   NUFR RTOS Sources
+    sources/nufr-kernel-messaging.c
+    sources/nufr-kernel-message-blocks.c
+    sources/nufr-kernel-task.c
+    sources/nufr-kernel-timer.c
+    sources/nufr-kernel-semaphore.c
+    sources/raging-utils.c
+    sources/raging-utils-mem.c
+
+    nufr-platform/pc-pthread/nufr-platform.c
+    nufr-platform/pc-pthread/Prepare_Stack.c
+
+	sources/nsvc-globals.c
+    sources/nsvc-messaging.c
+    sources/nsvc-mutex.c
+    sources/nsvc-pcl.c
+    sources/nsvc-pool.c
+    sources/nsvc-timer.c
+    sources/nsvc.c
+    sources/nufr-kernel-messaging.c
+    sources/nufr-kernel-semaphore.c
+    sources/nufr-kernel-task.c
+    sources/nufr-kernel-timer.c
+    sources/nufr-simulation.c
+    sources/raging-utils-mem.c
+    sources/raging-utils.c
+    tests/simulation/nsvc-app.c
+    tests/simulation/nufr-platform-app.c
+    tests/simulation/pthread-main.c
+    tests/simulation/ut-pthread.c
+
+	)
+
+set(elf_file ${app_name})
+
+add_executable(${elf_file} ${sources})
+
+target_include_directories(${elf_file} PUBLIC includes)
+target_include_directories(${elf_file} PUBLIC nufr-platform/pc-pthread)
+target_include_directories(${elf_file} PUBLIC tests/simulation)
+
+set(additional_compiler_flags -g -Wall -Wextra -pedantic)
+target_compile_options(${elf_file} PRIVATE ${additional_compiler_flags})
+
+set(additional_linker_flags -lpthread)
+target_link_libraries(${elf_file} PRIVATE ${additional_linker_flags})

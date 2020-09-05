@@ -1,0 +1,112 @@
+cmake_minimum_required(VERSION 3.0.0)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("Building Debug version of Firmware...")
+    set(opt_level -O0 -g)
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Size)
+     message("Building Release Size version of Firmware...")
+     set(opt_level -Os)
+endif()
+    
+if(CMAKE_BUILD_TYPE MATCHES Speed)
+     message("Building Release Speed version of Firmware...")
+     set(opt_level -O2)
+endif()
+      
+    
+#   Search for any CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
+#   Project Settings
+set(app_name "msp430-simple")
+set(elf_file ${app_name}.elf)
+set(bin_file ${app_name}.bin)
+set(hex_file ${app_name}.hex)
+set(map_file ${app_name}.map)
+set(lst_file ${app_name}.lst)
+
+#   Project name, uses C, C++ and Assembly
+project(${app_name} C CXX ASM)
+
+#   STM Processor Type
+#set(DEVICE_FAMILY STM32F429_439xx)
+
+#   External Crystal in MHz
+#set(HSE_VALUE 8000000)
+
+
+
+#   Linker File
+set(CPU_NAME msp430f5529)
+
+get_filename_component(LINKER_SCRIPT ${MSP430_GCC_INCLUDE_DIR}/${CPU_NAME}.ld ABSOLUTE)
+
+set(sources
+	#   NUFR RTOS Sources
+    sources/nufr-kernel-messaging.c
+    sources/nufr-kernel-message-blocks.c
+    sources/nufr-kernel-task.c
+    sources/nufr-kernel-timer.c
+    sources/nufr-kernel-semaphore.c
+
+    #	NUFR Platform sources
+    nufr-platform/msp430/nufr-platform.c
+    platform/MSP430/msp430-switch-support.c
+    platform/MSP430/Prepare_Stack.c
+    platform/MSP430/msp430-gcc/msp430-assembler.c
+    platform/MSP430/msp430-gcc/msp430-peripherals.c
+    platform/MSP430/msp430-gcc/reset-handler.c
+    platform/MSP430/msp430-gcc/vector-stubs.c
+
+    #   NUFR Service Layer Sources
+    sources/nsvc.c
+    sources/nsvc-globals.c
+    sources/nsvc-messaging.c
+    sources/nsvc-mutex.c
+    sources/nsvc-pcl.c
+    sources/nsvc-pool.c
+    sources/nsvc-timer.c
+
+    #	Raging utility Sources
+    sources/raging-utils.c
+    sources/raging-utils-mem.c
+
+    #	Project Sources
+    msp430-projects/simple/base-task.c
+    msp430-projects/simple/nufr-platform-app.c
+    msp430-projects/simple/nsvc-app.c
+    msp430-projects/simple/low-task.c
+    msp430-projects/simple/simple-main.c
+
+	)
+
+
+set(elf_file ${app_name}.elf)
+    
+
+add_executable(${elf_file} ${sources})
+
+target_include_directories(${elf_file} PUBLIC includes)
+target_include_directories(${elf_file} PUBLIC nufr-platform/msp430)
+target_include_directories(${elf_file} PUBLIC platform/MSP430)
+target_include_directories(${elf_file} PUBLIC platform/MSP430/msp430-gcc)
+target_include_directories(${elf_file} PUBLIC msp430-projects/simple)
+
+#target_compile_definitions(${elf_file} PUBLIC NUFR_ASSERT_LEVEL=0)
+target_compile_definitions(${elf_file} PUBLIC DEBUG)
+
+#set(additional_compile_flags -msmall -DSMALL_MODEL -mmcu=${CPU_NAME} ${opt_level})
+set(additional_compile_flags -mlarge -DLARGE_MODEL -mmcu=${CPU_NAME} ${opt_level})
+target_compile_options(${elf_file} PRIVATE ${additional_compile_flags})
+
+#set(additional_link_flags -msmall -DSMALL_MODEL -mmcu=${CPU_NAME} -nostartfiles ${opt_level})
+set(additional_link_flags -mlarge -DLARGE_MODEL -mmcu=${CPU_NAME} -nostartfiles ${opt_level})
+target_link_libraries(${elf_file} PUBLIC ${additional_link_flags})
+
+add_custom_target(size DEPENDS ${elf_file} COMMAND ${MSP_SIZE_EXECUTABLE} -B ${elf_file}) 
+add_custom_target(bin DEPENDS ${elf_file} COMMAND ${MSP_OBJCOPY_EXECUTABLE} -Obinary ${elf_file} ${bin_file})
+add_custom_target(list DEPENDS ${elf_file} COMMAND ${MSP_OBJDUMP_EXECUTABLE} -S ${elf_file} > ${lst_file})
+add_custom_target(hex DEPENDS ${elf_file} COMMAND ${MSP_OBJCOPY_EXECUTABLE} -Oihex ${elf_file} ${hex_file})
+add_custom_target(dump DEPENDS ${elf_file} COMMAND ${MSP_NM_EXECUTABLE} -A -C -td --reverse-sort --size-sort ${elf_file} | head -n20 | cat -n)

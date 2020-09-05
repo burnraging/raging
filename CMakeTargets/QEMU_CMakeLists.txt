@@ -1,0 +1,135 @@
+cmake_minimum_required(VERSION 3.0.0)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("Building Debug version of Firmware...")
+    set(opt_level -O0)
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Size)
+     message("Building Release Size version of Firmware...")
+     set(opt_level -Os)
+endif()
+    
+if(CMAKE_BUILD_TYPE MATCHES Speed)
+     message("Building Release Speed version of Firmware...")
+     set(opt_level -O2)
+endif()
+    
+#   Search for any CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
+#   Project Settings
+set(app_name "qemu-binary")
+set(elf_file ${app_name}.elf)
+set(bin_file ${app_name}.bin)
+set(hex_file ${app_name}.hex)
+set(map_file ${app_name}.map)
+set(lst_file ${app_name}.lst)
+
+#   Project name, uses C, C++ and Assembly
+project(${app_name} C ASM)
+
+# core flags
+set(CORE_FLAGS -mthumb -mcpu=cortex-m3 -mlittle-endian -mfloat-abi=soft -mthumb-interwork --specs=nano.specs --specs=nosys.specs ${ADDITIONAL_CORE_FLAGS})
+
+#   STM Processor Type
+#set(DEVICE_FAMILY STM32F429_439xx)
+
+#   External Crystal in MHz
+set(HSE_VALUE 8000000)
+
+#   Linker File
+get_filename_component(LINKER_SCRIPT platform/ARM_CMx/LinkerScript.ld ABSOLUTE)
+
+set(sources
+   	#   NUFR RTOS Sources
+    sources/nufr-kernel-messaging.c
+    sources/nufr-kernel-message-blocks.c
+    sources/nufr-kernel-task.c
+    sources/nufr-kernel-timer.c
+    sources/nufr-kernel-semaphore.c
+
+    #   NUFR Service Layer Sources
+    sources/nsvc.c
+    sources/nsvc-globals.c    
+    sources/nsvc-timer.c
+
+    #	Raging Utility Sources
+    sources/raging-utils.c
+
+    #	Project Sources
+    tests/qemu/sleeper.c
+    tests/qemu/messager.c
+    tests/qemu/nsvc-app.c
+
+    #	Qemu App Sources
+    tests/qemu/nufr-platform-app.c
+    tests/qemu/main.c
+
+    #	NUFR Platform Sources
+    tests/qemu/ut-armcmx-utils-mem.c
+
+    #   NUFR Platform Sources
+    nufr-platform/small-soc/nufr-platform.c
+
+    #   Platform Sources
+    platform/ARM_CMx/gcc/nufr-context-switch.s
+    platform/ARM_CMx/gcc/assembly.s
+    platform/ARM_CMx/gcc/armcmx-utils-mem.c
+    platform/ARM_CMx/gcc/Reset_Handler.c
+    platform/ARM_CMx/Prepare_Stack.c
+    platform/ARM_CMx/SysTick_Handler.c
+    platform/ARM_CMx/Default_Handler.c
+    platform/ARM_CMx/BusFault_Handler.c
+    platform/ARM_CMx/DebugMon_Handler.c
+    platform/ARM_CMx/HardFault_Handler.c
+    platform/ARM_CMx/NMI_Handler.c
+    platform/ARM_CMx/startup.c
+
+    #   RNET Sources
+    sources/rnet-ahdlc.c
+    sources/rnet-crc.c
+    sources/rnet-dispatch.c
+    sources/rnet-icmp.c
+    sources/rnet-intfc.c
+    sources/rnet-ip.c
+    sources/rnet-ip-utils.c
+    sources/rnet-ppp.c
+    sources/rnet-top.c
+    sources/rnet-udp.c
+
+    #	RNET App SOURCES
+    tests/qemu/rnet-app.c
+
+    #   Raging Utility Sources
+    sources/raging-utils.c
+    sources/raging-utils-crc.c
+    sources/raging-utils-os.c
+    sources/raging-utils-scan-print.c
+	)
+    
+set(elf_file ${app_name}.elf)
+
+add_executable(${elf_file} ${sources})
+
+target_include_directories(${elf_file} PUBLIC includes)
+target_include_directories(${elf_file} PUBLIC nufr-platform/small-soc)
+target_include_directories(${elf_file} PUBLIC platform/tests/qemu)
+target_include_directories(${elf_file} PUBLIC tests/qemu)
+
+#target_compile_definitions(${elf_file} PUBLIC NUFR_ASSERT_LEVEL=9)
+target_compile_definitions(${elf_file} PUBLIC DEBUG)
+
+set(additional_compiler_flags ${CORE_FLAGS} ${opt_level})
+target_compile_options(${elf_file} PRIVATE ${additional_compiler_flags})
+
+set(additional_linker_flags -Wl,-Map=${map_file},--cref,--no-warn-mismatch -nostdlib)
+target_link_libraries(${elf_file} PRIVATE ${additional_linker_flags})
+target_link_libraries(${elf_file} PUBLIC "-g -Wl,--gc-sections")
+target_link_libraries(${elf_file} PUBLIC -T${LINKER_SCRIPT})
+
+add_custom_target(size DEPENDS ${elf_file} COMMAND ${ARM_SIZE_EXECUTABLE} -B ${elf_file}) 
+add_custom_target(bin DEPENDS ${elf_file} COMMAND ${ARM_OBJCOPY_EXECUTABLE} -Obinary ${elf_file} ${bin_file})
+add_custom_target(list DEPENDS ${elf_file} COMMAND ${ARM_OBJDUMP_EXECUTABLE} -S ${elf_file} > ${lst_file})
+add_custom_target(hex DEPENDS ${elf_file} COMMAND ${ARM_OBJCOPY_EXECUTABLE} -Oihex ${elf_file} ${hex_file})
+add_custom_target(dump DEPENDS ${elf_file} COMMAND ${ARM_NM_EXECUTABLE} -A -C -td --reverse-sort --size-sort ${elf_file} | head -n20 | cat -n)
